@@ -1,8 +1,22 @@
 from battle_engine import run_battle
 import statistics
+import json
+import os
 
 # Constants
 NUM_SIMULATIONS = 1000
+SCENARIO_FILE = "scenarios.json"
+SELECTED_SCENARIO_ID = "small_skirmish" # Change this to "small_skirmish" to test
+
+def load_scenarios():
+    if not os.path.exists(SCENARIO_FILE):
+        print(f"Error: {SCENARIO_FILE} not found.")
+        return {}
+    
+    with open(SCENARIO_FILE, 'r') as f:
+        data = json.load(f)
+        
+    return {s['id']: s for s in data['scenarios']}
 
 def print_detailed_stats(name, data):
     if not data:
@@ -37,19 +51,37 @@ def print_detailed_stats(name, data):
     print(f"IQR:    {_iqr:.2f} (Q1={q1:.2f}, Q3={q3:.2f})")
 
 def simulation_loop():
-    print(f"Starting {NUM_SIMULATIONS} Simulations...")
+    scenarios = load_scenarios()
+    
+    if SELECTED_SCENARIO_ID not in scenarios:
+        print(f"Scenario '{SELECTED_SCENARIO_ID}' not found in {SCENARIO_FILE}")
+        return
+
+    scenario_config = scenarios[SELECTED_SCENARIO_ID]
+    print(f"Starting {NUM_SIMULATIONS} Simulations for scenario: {scenario_config['description']}")
     
     total_goodies_runs = []
     total_baddies_runs = []
     
+    goodies_wins = 0
+    baddies_wins = 0
+    
     for i in range(NUM_SIMULATIONS):
         # Print first battle for validation
         debug = (i == 0)
-        g_runs, b_runs = run_battle(battle_id=i+1, debug_print=debug)
+        g_runs, b_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config, debug_print=debug)
         total_goodies_runs.extend(g_runs)
         total_baddies_runs.extend(b_runs)
+        
+        if winner == "goodies":
+            goodies_wins += 1
+        else:
+            baddies_wins += 1
+            
+        print(f"Battle {i+1}: Winner = {winner.title()} | Running Score: Goodies {goodies_wins} - Baddies {baddies_wins}")
     
     print("\n=== Simulation Results ===")
+    print(f"Final Scorecard: Goodies {goodies_wins} - Baddies {baddies_wins}")
     print_detailed_stats("Player", total_goodies_runs)
     print_detailed_stats("Enemy", total_baddies_runs)
 

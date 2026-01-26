@@ -46,35 +46,28 @@ def select_actor(team, run_actors):
         return others[0]
     return candidates[0] # Fallback, shouldn't happen if list not empty
 
-def run_battle(battle_id, debug_print=False):
-    # Initialize Teams
-    # PCs
-    # PC 1: Expert Atk & Def
-    pc1 = Goodies(name="PC 1 (Exp Atk/Def)", expertise_attack=True, expertise_defense=True)
-    # PC 2: Expert Def
-    pc2 = Goodies(name="PC 2 (Exp Def)", expertise_attack=False, expertise_defense=True)
-    # PC 3: Expert Atk
-    pc3 = Goodies(name="PC 3 (Exp Atk)", expertise_attack=True, expertise_defense=False)
-    # PC 4-5: Baseline
-    pc4 = Goodies(name="PC 4", expertise_attack=False, expertise_defense=False)
-    pc5 = Goodies(name="PC 5", expertise_attack=False, expertise_defense=False)
-    goodies_team = [pc1, pc2, pc3, pc4, pc5]
-
-    # Enemies
-    # 6 Minions: DT 12, HP 1
-    minions = [Baddies(name=f"Minion {i+1}", hp=1, dt=12) for i in range(6)]
-    # 2 Elites: DT 15, HP 2
-    # Elite 1: Exp Atk
-    elite1 = Baddies(name="Elite 1 (Exp Atk)", hp=2, dt=15, expertise_attack=True)
-    # Elite 2: Exp Def
-    elite2 = Baddies(name="Elite 2 (Exp Def)", hp=2, dt=15, expertise_defense=True)
-    # Boss: DT 18, HP 4, Exp Atk & Def
-    boss = Baddies(name="Boss", hp=4, dt=18, expertise_attack=True, expertise_defense=True)
-    
-    baddies_team = minions + [elite1, elite2, boss]
+def run_battle(battle_id, scenario_config, debug_print=False):
+    # Initialize Teams from Scenario Config
+    goodies_team = []
+    for g_conf in scenario_config["goodies"]:
+        goodies_team.append(Goodies(
+            name=g_conf["name"], 
+            expertise_attack=g_conf.get("exp_atk", False), 
+            expertise_defense=g_conf.get("exp_def", False)
+        ))
+        
+    baddies_team = []
+    for b_conf in scenario_config["baddies"]:
+        baddies_team.append(Baddies(
+            name=b_conf["name"], 
+            hp=b_conf["hp"], 
+            dt=b_conf["dt"], 
+            expertise_attack=b_conf.get("exp_atk", False), 
+            expertise_defense=b_conf.get("exp_def", False)
+        ))
 
     # State
-    current_momentum = "goodies" # Starts with players
+    current_momentum = scenario_config.get("starting_momentum", "goodies")
     run_actors = set() # Track who acted in current run
     run_length = 0
     friction_banes = 0
@@ -205,4 +198,5 @@ def run_battle(battle_id, debug_print=False):
         else:
             baddies_run_lengths.append(run_length)
             
-    return goodies_run_lengths, baddies_run_lengths
+    winner = "goodies" if get_living_members(goodies_team) else "baddies"
+    return goodies_run_lengths, baddies_run_lengths, winner

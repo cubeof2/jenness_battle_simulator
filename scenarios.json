@@ -1,0 +1,134 @@
+{
+    "scenarios": [
+        {
+            "id": "default_battle",
+            "description": "The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).",
+            "starting_momentum": "goodies",
+            "goodies": [
+                {
+                    "name": "PC 1 (Exp Atk/Def)",
+                    "hp": 4,
+                    "aptitude": 5,
+                    "exp_atk": true,
+                    "exp_def": true
+                },
+                {
+                    "name": "PC 2 (Exp Def)",
+                    "hp": 4,
+                    "aptitude": 5,
+                    "exp_atk": false,
+                    "exp_def": true
+                },
+                {
+                    "name": "PC 3 (Exp Atk)",
+                    "hp": 4,
+                    "aptitude": 5,
+                    "exp_atk": true,
+                    "exp_def": false
+                },
+                {
+                    "name": "PC 4",
+                    "hp": 4,
+                    "aptitude": 5,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "PC 5",
+                    "hp": 4,
+                    "aptitude": 5,
+                    "exp_atk": false,
+                    "exp_def": false
+                }
+            ],
+            "baddies": [
+                {
+                    "name": "Minion 1",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Minion 2",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Minion 3",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Minion 4",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Minion 5",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Minion 6",
+                    "hp": 1,
+                    "dt": 12,
+                    "exp_atk": false,
+                    "exp_def": false
+                },
+                {
+                    "name": "Elite 1 (Exp Atk)",
+                    "hp": 2,
+                    "dt": 15,
+                    "exp_atk": true,
+                    "exp_def": false
+                },
+                {
+                    "name": "Elite 2 (Exp Def)",
+                    "hp": 2,
+                    "dt": 15,
+                    "exp_atk": false,
+                    "exp_def": true
+                },
+                {
+                    "name": "Boss",
+                    "hp": 4,
+                    "dt": 18,
+                    "exp_atk": true,
+                    "exp_def": true
+                }
+            ]
+        },
+        {
+            "id": "small_skirmish",
+            "description": "A small 1v1 test battle for mechanics validation.",
+            "starting_momentum": "goodies",
+            "goodies": [
+                {
+                    "name": "Hero Test",
+                    "hp": 10,
+                    "aptitude": 5,
+                    "exp_atk": true,
+                    "exp_def": true
+                }
+            ],
+            "baddies": [
+                {
+                    "name": "Goblin Test",
+                    "hp": 10,
+                    "dt": 10,
+                    "exp_atk": false,
+                    "exp_def": false
+                }
+            ]
+        }
+    ]
+}
