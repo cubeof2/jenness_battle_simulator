@@ -1,26 +1,27 @@
 import random
+import logging
+from typing import List, Set, Any, Tuple
 from goodies import Goodies
 from baddies import Baddies
 from mechanics import Outcome
 
-def get_living_members(team):
+logger = logging.getLogger(__name__)
+
+def get_living_members(team: List[Any]) -> List[Any]:
     return [m for m in team if m.is_alive()]
 
-def select_target(attacker, enemy_team):
+def select_target(attacker: Any, enemy_team: List[Any]) -> Any:
+    # Use the attacker's strategy if available
+    if hasattr(attacker, 'targeting_strategy'):
+        return attacker.targeting_strategy(attacker, enemy_team)
+    
+    # Fallback to random if no strategy defined
     living_enemies = get_living_members(team=enemy_team)
     if not living_enemies:
         return None
-    
-    # Player Strategy: Attack lowest DT
-    if isinstance(attacker, Goodies):
-        # Sort by DT, then random index for tie breaking (stable sort)
-        living_enemies.sort(key=lambda x: x.dt)
-        return living_enemies[0]
-    
-    # Enemy Strategy: Random target
     return random.choice(living_enemies)
 
-def select_actor(team, run_actors):
+def select_actor(team: List[Any], run_actors: Set[Any]) -> Any:
     """
     Selects the next character to act based on priority:
     1. Not acted in this run.
@@ -33,9 +34,6 @@ def select_actor(team, run_actors):
     candidates = not_acted if not_acted else living
     
     # Filter for Attack Experts if possible
-    # For Goodies: PC 1 (Atk & Def), PC 3 (Atk only) are experts.
-    # For Baddies: One Elite is expert. Boss is expert.
-    
     experts = [c for c in candidates if c.expertise_attack]
     others = [c for c in candidates if not c.expertise_attack]
     
@@ -46,7 +44,7 @@ def select_actor(team, run_actors):
         return others[0]
     return candidates[0] # Fallback, shouldn't happen if list not empty
 
-def run_battle(battle_id, scenario_config, debug_print=False):
+def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[int], str]:
     # Initialize Teams from Scenario Config
     goodies_team = []
     for g_conf in scenario_config["goodies"]:
@@ -79,16 +77,15 @@ def run_battle(battle_id, scenario_config, debug_print=False):
     
     turn_count = 0
     
-    if debug_print:
-        print(f"=== Battle {battle_id} Start ===")
+    logger.debug(f"=== Battle {battle_id} Start ===")
 
     while True:
         # Check Win
         if not get_living_members(team=goodies_team):
-            if debug_print: print("Enemies Win!")
+            logger.debug("Enemies Win!")
             break
         if not get_living_members(team=baddies_team):
-            if debug_print: print("Players Win!")
+            logger.debug("Players Win!")
             break
             
         turn_count += 1
@@ -106,12 +103,9 @@ def run_battle(battle_id, scenario_config, debug_print=False):
         target = select_target(attacker=actor, enemy_team=passive_team)
         
         if not target:
-            break # Should be caught by win check, but safety
+            break # Should be caught by win check
             
         # Friction Logic
-        # "Friction only begins after every living member ... has acted once"
-        # "Once friction begins, each additional action adds +1 Bane"
-        
         living_active = get_living_members(team=active_team)
         
         # Calculate Banes
@@ -121,25 +115,25 @@ def run_battle(battle_id, scenario_config, debug_print=False):
             banes = friction_banes
         
         # Perform Action (Attack)
-        if debug_print: print(f"Turn {turn_count}: {actor.name} (Banes: {banes}) attacks {target.name}")
+        logger.debug(f"Turn {turn_count}: {actor.name} (Banes: {banes}) attacks {target.name}")
         
         # Attack Roll
-        atk_dmg, atk_outcome = actor.make_attack(target=target, banes=banes, debug=debug_print)
+        atk_dmg, atk_outcome = actor.make_attack(target=target, banes=banes)
         
         attacker_dt = 12
-        if isinstance(actor, Baddies):
+        if hasattr(actor, 'dt'):
             attacker_dt = actor.dt
         
-        def_outcome = target.make_defense(attacker_dt=attacker_dt, banes=0, debug=debug_print) # Defender has no friction banes
+        def_outcome = target.make_defense(attacker_dt=attacker_dt, banes=0) # Defender has no friction banes
         
         # Resolve Damage
         damage_to_target = atk_dmg
         if def_outcome == Outcome.CATASTROPHE:
-            if debug_print: print("Defense Catastrophe! +2 Damage")
+            logger.debug("Defense Catastrophe! +2 Damage")
             damage_to_target += 2
             
         if damage_to_target > 0:
-            target.take_damage(amount=damage_to_target, debug=debug_print)
+            target.take_damage(amount=damage_to_target)
             
         # Update Run State (Action successfully taken)
         run_actors.add(actor)
@@ -157,9 +151,6 @@ def run_battle(battle_id, scenario_config, debug_print=False):
                  friction_active = True
         
         # Check Momentum Shift
-        # "Acting side retains ... ONLY on Triumph or Clean Success"
-        # "Defender steals ... ONLY on Triumph or Clean Success"
-        
         attacker_keeps = atk_outcome in [Outcome.TRIUMPH, Outcome.CLEAN_SUCCESS]
         defender_steals = def_outcome in [Outcome.TRIUMPH, Outcome.CLEAN_SUCCESS]
         
@@ -167,13 +158,13 @@ def run_battle(battle_id, scenario_config, debug_print=False):
         
         if defender_steals:
             momentum_shift = True
-            if debug_print: print("Momentum Stolen by Defender!")
+            logger.debug("Momentum Stolen by Defender!")
         elif attacker_keeps:
             momentum_shift = False
-            if debug_print: print("Momentum Retained by Attacker!")
+            logger.debug("Momentum Retained by Attacker!")
         else:
             momentum_shift = True
-            if debug_print: print("Momentum Lost (Failed to Retain)!")
+            logger.debug("Momentum Lost (Failed to Retain)!")
             
         if momentum_shift:
             # Record Run Length
@@ -189,7 +180,7 @@ def run_battle(battle_id, scenario_config, debug_print=False):
             run_length = 0
             friction_banes = 0
             friction_active = False
-            if debug_print: print(f"Momentum Shifts to {current_momentum}!")
+            logger.debug(f"Momentum Shifts to {current_momentum}!")
             
     # End of Battle - Record last run?
     if run_length > 0:

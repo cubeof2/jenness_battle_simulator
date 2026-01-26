@@ -1,14 +1,19 @@
+import logging
+import argparse
+import sys
 from battle_engine import run_battle
+from typing import List, Dict, Any
 import statistics
 import json
 import os
 
-# Constants
-NUM_SIMULATIONS = 500
-SCENARIO_FILE = "scenarios.json"
-SELECTED_SCENARIO_ID = "small_skirmish" # Change this to "small_skirmish" to test
+# Configure Basic Logging
+logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger('battle_sim')
 
-def load_scenarios():
+SCENARIO_FILE = "scenarios.json"
+
+def load_scenarios() -> Dict[str, Any]:
     if not os.path.exists(SCENARIO_FILE):
         print(f"Error: {SCENARIO_FILE} not found.")
         return {}
@@ -18,7 +23,7 @@ def load_scenarios():
         
     return {s['id']: s for s in data['scenarios']}
 
-def print_detailed_stats(name, data):
+def print_detailed_stats(name: str, data: List[int]):
     if not data:
         print(f"{name}: No data collected.")
         return
@@ -29,7 +34,6 @@ def print_detailed_stats(name, data):
     _median = statistics.median(data)
     
     # Calculate IQR
-    # Try using statistics.quantiles (Python 3.8+)
     try:
         qs = statistics.quantiles(data, n=4)
         q1 = qs[0]
@@ -50,15 +54,15 @@ def print_detailed_stats(name, data):
     print(f"Max:    {_max}")
     print(f"IQR:    {_iqr:.2f} (Q1={q1:.2f}, Q3={q3:.2f})")
 
-def simulation_loop():
+def simulation_loop(scenario_id: str, num_simulations: int):
     scenarios = load_scenarios()
     
-    if SELECTED_SCENARIO_ID not in scenarios:
-        print(f"Scenario '{SELECTED_SCENARIO_ID}' not found in {SCENARIO_FILE}")
+    if scenario_id not in scenarios:
+        print(f"Scenario '{scenario_id}' not found in {SCENARIO_FILE}")
         return
 
-    scenario_config = scenarios[SELECTED_SCENARIO_ID]
-    print(f"Starting {NUM_SIMULATIONS} Simulations for scenario: {scenario_config['description']}")
+    scenario_config = scenarios[scenario_id]
+    print(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
     
     total_goodies_runs = []
     total_baddies_runs = []
@@ -66,10 +70,17 @@ def simulation_loop():
     goodies_wins = 0
     baddies_wins = 0
     
-    for i in range(NUM_SIMULATIONS):
-        # Print first battle for validation
-        debug = (i == 0)
-        g_runs, b_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config, debug_print=debug)
+    # Get root logger to control level globally
+    root_logger = logging.getLogger()
+    
+    for i in range(num_simulations):
+        # Set logging level: DEBUG for first run, INFO for subsequent
+        if i == 0:
+            root_logger.setLevel(logging.DEBUG)
+        else:
+            root_logger.setLevel(logging.INFO)
+            
+        g_runs, b_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config)
         total_goodies_runs.extend(g_runs)
         total_baddies_runs.extend(b_runs)
         
@@ -78,10 +89,10 @@ def simulation_loop():
         else:
             baddies_wins += 1
             
-        if debug:
-            pass # Keep debug logic if needed later, or just remove if empty
-            
-        print(f"Battle {i+1}: Winner = {winner.title()} | Running Score: Goodies {goodies_wins} - Baddies {baddies_wins}")
+        # Log result using INFO level so it always shows
+        # Note: Since we switch to INFO level for subsequent runs, strictly INFO logs appeal.
+        # But for the FIRST run (DEBUG level), INFO logs also appear.
+        root_logger.info(f"Battle {i+1}: Winner = {winner.title()} | Running Score: Goodies {goodies_wins} - Baddies {baddies_wins}")
     
     print("\n=== Simulation Results ===")
     print(f"Final Scorecard: Goodies {goodies_wins} - Baddies {baddies_wins}")
@@ -89,7 +100,15 @@ def simulation_loop():
     print_detailed_stats("Enemy", total_baddies_runs)
 
 def main():
-    simulation_loop()
+    parser = argparse.ArgumentParser(description="Jenness Battle Simulator")
+    parser.add_argument("--scenario", type=str, default="small_skirmish", 
+                        help="ID of the scenario to run (from scenarios.json)")
+    parser.add_argument("--runs", type=int, default=500, 
+                        help="Number of simulations to run")
+    
+    args = parser.parse_args()
+    
+    simulation_loop(scenario_id=args.scenario, num_simulations=args.runs)
 
 if __name__ == "__main__":
     main()
