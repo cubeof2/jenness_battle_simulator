@@ -124,13 +124,13 @@ def run_battle(battle_id, scenario_config, debug_print=False):
         if debug_print: print(f"Turn {turn_count}: {actor.name} (Banes: {banes}) attacks {target.name}")
         
         # Attack Roll
-        atk_dmg, atk_outcome = actor.make_attack(target=target, banes=banes)
+        atk_dmg, atk_outcome = actor.make_attack(target=target, banes=banes, debug=debug_print)
         
         attacker_dt = 12
         if isinstance(actor, Baddies):
             attacker_dt = actor.dt
         
-        def_outcome = target.make_defense(attacker_dt=attacker_dt, banes=0) # Defender has no friction banes
+        def_outcome = target.make_defense(attacker_dt=attacker_dt, banes=0, debug=debug_print) # Defender has no friction banes
         
         # Resolve Damage
         damage_to_target = atk_dmg
@@ -139,7 +139,7 @@ def run_battle(battle_id, scenario_config, debug_print=False):
             damage_to_target += 2
             
         if damage_to_target > 0:
-            target.take_damage(amount=damage_to_target)
+            target.take_damage(amount=damage_to_target, debug=debug_print)
             
         # Update Run State (Action successfully taken)
         run_actors.add(actor)

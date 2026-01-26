@@ -4,7 +4,7 @@ import json
 import os
 
 # Constants
-NUM_SIMULATIONS = 1000
+NUM_SIMULATIONS = 500
 SCENARIO_FILE = "scenarios.json"
 SELECTED_SCENARIO_ID = "small_skirmish" # Change this to "small_skirmish" to test
 
@@ -77,6 +77,9 @@ def simulation_loop():
             goodies_wins += 1
         else:
             baddies_wins += 1
+            
+        if debug:
+            pass # Keep debug logic if needed later, or just remove if empty
             
         print(f"Battle {i+1}: Winner = {winner.title()} | Running Score: Goodies {goodies_wins} - Baddies {baddies_wins}")
     

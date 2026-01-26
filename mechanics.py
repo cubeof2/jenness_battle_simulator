@@ -61,4 +61,4 @@ def resolve_roll(is_expert, aptitude, banes, dt):
         # total is between DT-2 and DT+2 inclusive
         outcome = Outcome.SETBACK
         
-    return total, die_roll == 20, outcome
+    return total, die_roll == 20, outcome, die_roll, boon_roll

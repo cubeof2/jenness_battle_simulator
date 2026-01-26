@@ -152,46 +152,43 @@ class Goodies:
         
         self.dt = 12 # Default DT for now
 
-    def make_attack(self, target, banes):
-        print(f"{self.name} attacks {target.name}!")
+    def make_attack(self, target, banes, debug=True):
+        if debug:
+            print(f"{self.name} attacks {target.name}!")
+        
         # Roll Attack
-        total, nat20, outcome = resolve_roll(self.expertise_attack, self.aptitude, banes, target.dt)
+        total, nat20, outcome, die_roll, boon_roll = resolve_roll(self.expertise_attack, self.aptitude, banes, target.dt)
+        
+        if debug:
+            print(f"  -> Attack Roll: {die_roll} (d20) + {self.aptitude} (Apt) + {boon_roll} (Boon) - {banes} (Banes) = {total}")
+            print(f"  -> vs DT {target.dt}: {outcome.value}")
         
         damage = 0
         if outcome == Outcome.TRIUMPH:
             damage = 2
-        elif outcome == Outcome.CLEAN_SUCCESS: # Check "Normal hit" triggers? "Clean Success: total >= DT+3". 
-             # Wait, "Normal hit: 1 HP". Does Setback hit?
-             # "Setback: total within DT +/- 2".
-             # "Failure: total < DT - 2".
-             # Usually Setback is "Success with cost" or "Failure with partial".
-             # Let's assume: Clean Success = Hit. Triumph = Crit Hit. 
-             # Setback = ? (Maybe Hit but Momentum shifts? Or Miss but Momentum stays?)
-             # "Retaining Momentum ... ONLY on Triumph or Clean Success". 
-             # So Setback = Loss of Momentum. 
-             # Does Setback deal damage?
-             # "Normal hit: 1 HP".
-             # If Setback is a "Miss", it deals 0. 
-             # Let's assume Setback is a MISS (or ineffective hit) for damage purposes, given the specific categories. 
-             # OR Setback is a HIT that loses momentum.
-             # Prompt: "Damage Rules... Normal hit: 1 HP". Doesn't map Outcome to "Normal hit".
-             # Implied: Clean Success = Normal Hit. Triumph = Crit.
-             # Setback/Failure/Catastrophe = Miss/No Damage.
+        elif outcome == Outcome.CLEAN_SUCCESS:
+             # Clean Success logic
              pass
+             
         if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
              damage = max(1, damage)
         
         return damage, outcome
 
-    def make_defense(self, attacker_dt, banes):
+    def make_defense(self, attacker_dt, banes, debug=True):
          # Resolve Defense Roll
-         total, nat20, outcome = resolve_roll(self.expertise_defense, self.aptitude, banes, attacker_dt)
+         total, nat20, outcome, die_roll, boon_roll = resolve_roll(self.expertise_defense, self.aptitude, banes, attacker_dt)
+         if debug:
+             print(f"{self.name} defends!")
+             print(f"  -> Defense Roll: {die_roll} (d20) + {self.aptitude} (Apt) + {boon_roll} (Boon) - {banes} (Banes) = {total}")
+             print(f"  -> vs DT {attacker_dt}: {outcome.value}")
          return outcome
 
-    def take_damage(self, amount):
+    def take_damage(self, amount, debug=True):
         self.hp -= amount
         if self.hp < 0: self.hp = 0
-        print(f"{self.name} takes {amount} damage. HP: {self.hp}")
+        if debug:
+            print(f"{self.name} takes {amount} damage. HP: {self.hp}")
 
     def is_alive(self):
         return self.hp > 0
