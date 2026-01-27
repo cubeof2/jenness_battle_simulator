@@ -8,14 +8,32 @@ from typing import List, Any, Optional
 # The Combatant Protocol and get_living_members helper are removed as they are not used by the new strategies.
 
 def random_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
-    """Randomly selects a target from the living enemies."""
+    """
+    Randomly selects a target from the living enemies.
+    
+    Args:
+        actor (Any): The entity acting.
+        enemy_team (List[Any]): List of enemy entities.
+        
+    Returns:
+        Optional[Any]: The selected target, or None.
+    """
     living_enemies = [e for e in enemy_team if e.is_alive()]
     if not living_enemies:
         return None
     return random.choice(living_enemies)
 
 def lowest_dt_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
-    """Selects the enemy with the lowest DT."""
+    """
+    Selects the enemy with the lowest Difficulty Threshold (DT).
+    
+    Args:
+        actor (Any): The entity acting.
+        enemy_team (List[Any]): List of enemy entities.
+        
+    Returns:
+        Optional[Any]: The selected target, or None.
+    """
     living_enemies = [e for e in enemy_team if e.is_alive()]
     if not living_enemies:
         return None

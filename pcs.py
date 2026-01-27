@@ -6,28 +6,50 @@ from strategies import lowest_dt_strategy
 logger = logging.getLogger(__name__)
 
 class PC:
+    """
+    Represents a Player Character.
+
+    Attributes:
+        name (str): The name of the PC.
+        hp (int): Current Hit Points.
+        max_hp (int): Maximum Hit Points.
+        aptitude (int): Base bonus added to rolls (default 5).
+        expertise_attack (bool): If True, grants 2d20kh on Attack rolls.
+        expertise_defense (bool): If True, grants 2d20kh on Defense rolls.
+        targeting_strategy (callable): Function to select a target from a list of enemies.
+    """
     def __init__(self, name: str, expertise_attack: bool = False, expertise_defense: bool = False, targeting_strategy=lowest_dt_strategy):
+        """
+        Initialize a PC.
+
+        Args:
+            name (str): Name of the PC.
+            expertise_attack (bool, optional): Whether the PC has attack expertise. Defaults to False.
+            expertise_defense (bool, optional): Whether the PC has defense expertise. Defaults to False.
+            targeting_strategy (callable, optional): Strategy function for targeting. Defaults to lowest_dt_strategy.
+        """
         self.name = name
         self.hp = 4
         self.max_hp = 4
         self.aptitude = 5
         self.expertise_attack = expertise_attack
         self.expertise_defense = expertise_defense
-        self.dt = 12 # Default DT
         self.targeting_strategy = targeting_strategy
 
     def make_attack(self, target: Any, friction_banes: int) -> tuple[int, Outcome]:
         """
-        PC attacks an NPC.
-        Rolls Attack (Aptitude) vs Target DT.
-        Banes = Friction Banes + Target Defense Expertise (1 stack if expert).
+        PC makes an attack roll against a target.
+
+        Args:
+            target (Any): The enemy entity being attacked. Must have a 'dt' attribute.
+            friction_banes (int): Number of banes accumulated due to friction/momentum.
+
+        Returns:
+            tuple[int, Outcome]: A tuple containing the damage dealt (int) and the Outcome enum.
         """
         logger.debug(f"{self.name} attacks {target.name}!")
         
         # Determine Bane Stacks
-        # 1 from friction? (passed in)
-        # 1 from NPC defense expertise?
-        
         bane_stacks = friction_banes
         if getattr(target, 'expertise_defense', False):
              bane_stacks += 1
@@ -48,44 +70,27 @@ class PC:
         if outcome == Outcome.TRIUMPH:
             damage = 2
         elif outcome == Outcome.CLEAN_SUCCESS:
-             pass # Does this mean 1? The original code had pass?? 
-             # Looking at original goodies.py:
-             # elif outcome == Outcome.CLEAN_SUCCESS:
-             #      pass
-             #
-             # if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
-             #      damage = max(1, damage)
-             # Thus Clean Success is 1. Triumph is 2.
+             pass 
              
         if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
              damage = max(1, damage)
         
         return damage, outcome
 
-    def make_defense(self, attacker: Any, friction_banes: int) -> Outcome:
+    def defend_attack(self, attacker: Any, friction_banes: int) -> Outcome:
          """
-         PC defends against an NPC attack.
-         Rolls Defense (Aptitude) vs Attacker DT (or standardized DT?).
-         The prompt say: "PC's expertise (attack or defense) determines whether the D20 roll is d20 or 2d20kh"
-         "NPC's expertise (attack or defense) determines whether a bane is added to the PC's roll."
-         
-         So PC rolls Defense.
-         Expertise: self.expertise_defense
-         DT: Attacker DT? (Let's assume standard logic of rolling vs Difficulty)
-         Banes: Friction Banes + Attacker Attack Expertise.
+         PC rolls to defend against an incoming attack.
+
+         Args:
+             attacker (Any): The entity attacking the PC. Must have a 'dt' attribute.
+             friction_banes (int): Number of banes accumulated due to friction/momentum.
+
+         Returns:
+             Outcome: The result of the defense roll.
          """
          attacker_dt = getattr(attacker, 'dt', 12)
          
-         bane_stacks = friction_banes # Friction applies to the actor?
-         # Wait. If NPC is attacking (Actor), does Friction apply to THEM?
-         # "friction_banes" in engine usually tracks how long the "Momentum Run" is.
-         # If NPC is acting, and momentum is NPC, friction applies to NPC actions.
-         # Since PC is rolling defense AS the resolution of NPC action, the friction banes likely apply here to make it harder for PC to defend?
-         # Or does it make it harder for NPC to hit?
-         # If Friction = "Things getting messy/tired", usually applies to the Actor.
-         # If NPC is Actor -> They are "attacking".
-         # Taking a bane on PC defense roll makes it harder for PC to defend -> Easier for NPC to hit.
-         # So Friction Banes should be ADDED to PC Defense roll (making it lower, causing failure).
+         bane_stacks = friction_banes 
          
          if getattr(attacker, 'expertise_attack', False):
              bane_stacks += 1
@@ -105,9 +110,22 @@ class PC:
          return outcome
 
     def take_damage(self, amount: int):
+        """
+        Apply damage to the PC.
+
+        Args:
+            amount (int): Amount of damage to subtract from HP.
+        """
         self.hp -= amount
         if self.hp < 0: self.hp = 0
         logger.debug(f"{self.name} takes {amount} damage. HP: {self.hp}")
 
     def is_alive(self) -> bool:
+        """
+        Check if the PC is alive.
+
+        Returns:
+            bool: True if HP > 0, False otherwise.
+        """
         return self.hp > 0
+
