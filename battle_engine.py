@@ -101,7 +101,7 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
     current_momentum = scenario_config.get("starting_momentum", "pcs")
     run_actors = set() # Track who acted in current run
     run_length = 0
-    friction_banes = 0
+    friction_stacks = 0  # Renamed: applied as banes or boons depending on momentum
     friction_active = False # Friction starts AFTER everyone acted once
 
     # Stats Tracking
@@ -141,21 +141,21 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
         # Friction Logic
         living_active = get_living_members(team=active_team)
         
-        # Calculate Friction Banes for this Turn
-        banes = 0
+        # Calculate Friction for this Turn
+        friction_count = 0
         if friction_active:
-            friction_banes += 1
-            banes = friction_banes
+            friction_stacks += 1
+            friction_count = friction_stacks
         
-        logger.debug(f"Turn {turn_count}: {actor.name} (Banes: {banes}) acts against {target.name}")
+        logger.debug(f"Turn {turn_count}: {actor.name} (Friction: {friction_count}) acts against {target.name}")
         
         # --- EXECUTE ACTION ---
         outcome = Outcome.FAILURE # Default
         momentum_shift = False # Default
 
         if isinstance(actor, PC):
-            # PC Attacking NPC
-            damage, outcome = actor.make_attack(target=target, friction_banes=banes)
+            # PC Attacking NPC - friction applies as banes (PCs have momentum)
+            damage, outcome = actor.make_attack(target=target, friction_banes=friction_count)
             
             if damage > 0:
                 target.take_damage(amount=damage)
@@ -170,8 +170,8 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
 
         elif isinstance(actor, NPC):
             # NPC Attacking PC -> PC Defends
-            # Note: banes passed here are friction banes. PC.defend_attack will add NPC attack expertise as bane too.
-            outcome = target.defend_attack(attacker=actor, friction_banes=banes)
+            # Friction applies as BOONS to PC (NPCs have momentum, friction helps PC defend)
+            outcome = target.defend_attack(attacker=actor, friction_boons=friction_count)
             
             # Defense Success (PC Avoids) = Clean Success or Triumph
             # Defense Failure (PC Hit) = Failure, Setback, Catastrophe
@@ -227,7 +227,7 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
             # Reset Run State
             run_actors = set()
             run_length = 0
-            friction_banes = 0
+            friction_stacks = 0
             friction_active = False
             
     # End of Battle - Record last run

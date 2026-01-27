@@ -77,35 +77,39 @@ class PC:
         
         return damage, outcome
 
-    def defend_attack(self, attacker: Any, friction_banes: int) -> Outcome:
+    def defend_attack(self, attacker: Any, friction_boons: int = 0) -> Outcome:
          """
          PC rolls to defend against an incoming attack.
 
          Args:
              attacker (Any): The entity attacking the PC. Must have a 'dt' attribute.
-             friction_banes (int): Number of banes accumulated due to friction/momentum.
+             friction_boons (int): Number of boons accumulated due to friction (when NPCs have momentum).
 
          Returns:
              Outcome: The result of the defense roll.
          """
          attacker_dt = getattr(attacker, 'dt', 12)
          
-         bane_stacks = friction_banes 
+         bane_stacks = 0
          
          if getattr(attacker, 'expertise_attack', False):
              bane_stacks += 1
              logger.debug(f"  -> Added Bane for Attacker Attack Expertise (Total Banes: {bane_stacks})")
+         
+         # Friction is applied as boons when defending (NPCs have momentum)
+         boon_stacks = 1 + friction_boons  # Base 1 boon + friction boons
              
          # Resolve Defense Roll
          total, nat20, outcome, die_roll, boon_roll, bane_roll = resolve_roll(
              expertise=self.expertise_defense, 
              aptitude=self.aptitude, 
              bane_stacks=bane_stacks, 
-             dt=attacker_dt
+             dt=attacker_dt,
+             boon_stacks=boon_stacks
          )
          
          logger.debug(f"{self.name} defends against {attacker.name}!")
-         logger.debug(f"  -> Defense Roll: {die_roll} (d20) + {self.aptitude} (Apt) + {boon_roll} (Boon) - {bane_roll} (Bane) = {total}")
+         logger.debug(f"  -> Defense Roll: {die_roll} (d20) + {self.aptitude} (Apt) + {boon_roll} (Boon, stacks={boon_stacks}) - {bane_roll} (Bane) = {total}")
          logger.debug(f"  -> vs DT {attacker_dt}: {outcome.value}")
          return outcome
 

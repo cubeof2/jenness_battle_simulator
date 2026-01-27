@@ -26,14 +26,36 @@ def roll_d20(expertise: bool = False) -> int:
         return max(r1, r2)
     return random.randint(1, 20)
 
-def roll_boon() -> int:
+def roll_boon(stacks: int = 1) -> int:
     """
-    Rolls a 1d4 boon.
+    Rolls a boon die based on number of stacks.
+    
+    Scaling:
+    - <= 0 stacks: 0
+    - 1 stack: d4
+    - 2 stacks: d6
+    - 3 stacks: d8
+    - 4 stacks: d10
+    - 5+ stacks: d12
+    
+    Args:
+        stacks (int): The number of boon stacks accumulated.
     
     Returns:
-        int: Result (1-4).
+        int: Result.
     """
-    return random.randint(1, 4)
+    if stacks <= 0:
+        return 0
+    elif stacks == 1:
+        return random.randint(1, 4)
+    elif stacks == 2:
+        return random.randint(1, 6)
+    elif stacks == 3:
+        return random.randint(1, 8)
+    elif stacks == 4:
+        return random.randint(1, 10)
+    else:
+        return random.randint(1, 12)
 
 def roll_bane(stacks: int) -> int:
     """
@@ -93,20 +115,21 @@ def calculate_outcome(roll_total: int, dt: int) -> Outcome:
     else:
         return Outcome.FAILURE
 
-def resolve_roll(expertise: bool, aptitude: int, bane_stacks: int, dt: int) -> Tuple[int, bool, Outcome, int, int, int]:
+def resolve_roll(expertise: bool, aptitude: int, bane_stacks: int, dt: int, boon_stacks: int = 1) -> Tuple[int, bool, Outcome, int, int, int]:
     """
     Performs the full resolution mechanics: 
     1. Roll d20 (or 2d20kh if expert).
     2. Add Aptitude.
-    3. Add Boon (d4).
-    4. Subtract Bane (d4-d12 based on stacks).
+    3. Calculate net boon/bane stacks (they cancel out).
+    4. Roll only a boon OR a bane, never both.
     5. Compare to DT.
     
     Args:
         expertise (bool): If True, use advantageous d20 roll.
         aptitude (int): Base bonus to add.
-        bane_stacks (int): Number of banes to determine bane die size.
+        bane_stacks (int): Number of bane stacks.
         dt (int): Difficulty Threshold.
+        boon_stacks (int): Number of boon stacks (default 1 for PCs).
         
     Returns:
         Tuple containing:
@@ -114,12 +137,26 @@ def resolve_roll(expertise: bool, aptitude: int, bane_stacks: int, dt: int) -> T
         - nat20 (bool): True if the d20 roll was a natural 20.
         - outcome (Outcome): The result enum.
         - die_roll (int): The raw d20 roll result.
-        - boon_roll (int): The raw boon roll result.
-        - bane_roll (int): The raw bane roll result.
+        - boon_roll (int): The raw boon roll result (0 if net was banes).
+        - bane_roll (int): The raw bane roll result (0 if net was boons).
     """
     die_roll = roll_d20(expertise=expertise)
-    boon_roll = roll_boon()
-    bane_roll = roll_bane(bane_stacks)
+    
+    # Boons and banes cancel out - compute net value
+    net_stacks = boon_stacks - bane_stacks
+    
+    if net_stacks > 0:
+        # Net boons
+        boon_roll = roll_boon(net_stacks)
+        bane_roll = 0
+    elif net_stacks < 0:
+        # Net banes
+        boon_roll = 0
+        bane_roll = roll_bane(abs(net_stacks))
+    else:
+        # Cancel out completely
+        boon_roll = 0
+        bane_roll = 0
     
     # Calculate regular total
     total = die_roll + aptitude + boon_roll - bane_roll
