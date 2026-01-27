@@ -1,62 +1,359 @@
-Scenario: The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).
-Simulations: 100
-Log Mode: short
+Scenario: A small 1v1 test battle for mechanics validation.
+Simulations: 500
+Log Mode: default
 
+=== Battle 1 Start ===
+Turn 1: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 16 (d20) + 5 (Apt) + 3 (Boon) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 39
+PC Attack Successful! Momentum Retained.
+Turn 2: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 15 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 20
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 3: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 18 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 4: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 8 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 15
+  -> vs DT 18: Failure
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 5: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 12 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 18
+  -> vs DT 18: Setback
+PC Defense Setback! Takes 1 Damage.
+Hero Test takes 1 damage. HP: 3
+PC Defense Failed/Setback. NPC Keeps Momentum.
+Turn 6: Goblin Test (Friction: 1) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 17 (d20) + 5 (Apt) + 2 (Boon, stacks=2) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 7: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 10 (d20) + 5 (Apt) + 4 (Boon) - 0 (Bane) = 19
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 8: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 18 (d20) + 5 (Apt) + 4 (Boon, stacks=1) - 0 (Bane) = 27
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 9: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 16 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 23
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 38
+PC Attack Successful! Momentum Retained.
+Turn 10: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 18 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 23
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 37
+PC Attack Successful! Momentum Retained.
+Turn 11: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 8 (d20) + 5 (Apt) + 0 (Boon) - 1 (Bane) = 12
+  -> vs DT 18: Failure
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 12: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 17 (d20) + 5 (Apt) + 2 (Boon, stacks=1) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 13: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 10 (d20) + 5 (Apt) + 1 (Boon) - 0 (Bane) = 16
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 14: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 18 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 15: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 12 (d20) + 5 (Apt) + 1 (Boon) - 0 (Bane) = 18
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 16: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 20 (d20) + 5 (Apt) + 3 (Boon, stacks=1) - 0 (Bane) = 28
+  -> vs DT 18: Triumph
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 17: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 17 (d20) + 5 (Apt) + 1 (Boon) - 0 (Bane) = 23
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 36
+PC Attack Successful! Momentum Retained.
+Turn 18: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 18 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 23
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 35
+PC Attack Successful! Momentum Retained.
+Turn 19: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 20 (d20) + 5 (Apt) + 0 (Boon) - 1 (Bane) = 24
+  -> vs DT 18: Triumph
+Goblin Test takes 2 damage. HP: 33
+PC Attack Successful! Momentum Retained.
+Turn 20: Hero Test (Friction: 3) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 17 (d20) + 5 (Apt) + 0 (Boon) - 5 (Bane) = 17
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 21: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 17 (d20) + 5 (Apt) + 4 (Boon, stacks=1) - 0 (Bane) = 26
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 22: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 13 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 20
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 23: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 16 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 22
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 24: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 9 (d20) + 5 (Apt) + 3 (Boon) - 0 (Bane) = 17
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 25: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 20 (d20) + 5 (Apt) + 4 (Boon, stacks=1) - 0 (Bane) = 29
+  -> vs DT 18: Triumph
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 26: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 11 (d20) + 5 (Apt) + 4 (Boon) - 0 (Bane) = 20
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 27: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 17 (d20) + 5 (Apt) + 3 (Boon, stacks=1) - 0 (Bane) = 25
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 28: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 15 (d20) + 5 (Apt) + 1 (Boon) - 0 (Bane) = 21
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 32
+PC Attack Successful! Momentum Retained.
+Turn 29: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 19 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 31
+PC Attack Successful! Momentum Retained.
+Turn 30: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 5 (d20) + 5 (Apt) + 0 (Boon) - 3 (Bane) = 7
+  -> vs DT 18: Catastrophe
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 31: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 12 (d20) + 5 (Apt) + 4 (Boon, stacks=1) - 0 (Bane) = 21
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 32: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 18 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 25
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 30
+PC Attack Successful! Momentum Retained.
+Turn 33: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 19 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 24
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 29
+PC Attack Successful! Momentum Retained.
+Turn 34: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 17 (d20) + 5 (Apt) + 0 (Boon) - 1 (Bane) = 21
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 28
+PC Attack Successful! Momentum Retained.
+Turn 35: Hero Test (Friction: 3) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 4 (d20) + 5 (Apt) + 0 (Boon) - 5 (Bane) = 4
+  -> vs DT 18: Catastrophe
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 36: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 13 (d20) + 5 (Apt) + 3 (Boon, stacks=1) - 0 (Bane) = 21
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 37: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 15 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 22
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 27
+PC Attack Successful! Momentum Retained.
+Turn 38: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 16 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 21
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 26
+PC Attack Successful! Momentum Retained.
+Turn 39: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 10 (d20) + 5 (Apt) + 0 (Boon) - 2 (Bane) = 13
+  -> vs DT 18: Failure
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 40: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 20 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 26
+  -> vs DT 18: Triumph
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 41: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 15 (d20) + 5 (Apt) + 2 (Boon) - 0 (Bane) = 22
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 25
+PC Attack Successful! Momentum Retained.
+Turn 42: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 17 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 22
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 24
+PC Attack Successful! Momentum Retained.
+Turn 43: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 12 (d20) + 5 (Apt) + 0 (Boon) - 1 (Bane) = 16
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 44: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 13 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 19
+  -> vs DT 18: Setback
+PC Defense Setback! Takes 1 Damage.
+Hero Test takes 1 damage. HP: 2
+PC Defense Failed/Setback. NPC Keeps Momentum.
+Turn 45: Goblin Test (Friction: 1) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 7 (d20) + 5 (Apt) + 3 (Boon, stacks=2) - 0 (Bane) = 15
+  -> vs DT 18: Failure
+PC Defense Failure! Takes 1 Damage.
+Hero Test takes 1 damage. HP: 1
+PC Defense Failed/Setback. NPC Keeps Momentum.
+Turn 46: Goblin Test (Friction: 2) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 18 (d20) + 5 (Apt) + 3 (Boon, stacks=3) - 0 (Bane) = 26
+  -> vs DT 18: Clean Success
+PC Defended Successfully! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 47: Hero Test (Friction: 0) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 17 (d20) + 5 (Apt) + 1 (Boon) - 0 (Bane) = 23
+  -> vs DT 18: Clean Success
+Goblin Test takes 1 damage. HP: 23
+PC Attack Successful! Momentum Retained.
+Turn 48: Hero Test (Friction: 1) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 20 (d20) + 5 (Apt) + 0 (Boon) - 0 (Bane) = 25
+  -> vs DT 18: Triumph
+Goblin Test takes 2 damage. HP: 21
+PC Attack Successful! Momentum Retained.
+Turn 49: Hero Test (Friction: 2) acts against Goblin Test
+Hero Test attacks Goblin Test!
+  -> Attack Roll: 13 (d20) + 5 (Apt) + 0 (Boon) - 1 (Bane) = 17
+  -> vs DT 18: Setback
+PC Attack Failed! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 50: Goblin Test (Friction: 0) acts against Hero Test
+Hero Test defends against Goblin Test!
+  -> Defense Roll: 8 (d20) + 5 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 14
+  -> vs DT 18: Failure
+PC Defense Failure! Takes 1 Damage.
+Hero Test takes 1 damage. HP: 0
+PC Defense Failed/Setback. NPC Keeps Momentum.
+NPCs Win!
+Battle 1: Winner = NPCS | Running Score: PCs 0 - NPCs 1
 
 === Simulation Results ===
-Final Scorecard: PCs 90 - NPCs 10
+Final Scorecard: PCs 0 - NPCs 500
 
 --- PC Run Length Stats ---
-Mean:   2.30
+Mean:   1.97
 Median: 2.00
 Min:    1
-Max:    11
+Max:    6
 IQR:    2.00 (Q1=1.00, Q3=3.00)
 
 --- PC Run Length Histogram ---
- 1: ████████████████████████████████████████ ( 401,  43.3%)
- 2: ██████████████████                       ( 187,  20.2%)
- 3: █████████████████                        ( 179,  19.3%)
- 4: ████████                                 (  81,   8.7%)
- 5: ███                                      (  32,   3.5%)
- 6: █                                        (  13,   1.4%)
- 7: ██                                       (  23,   2.5%)
- 8:                                          (   4,   0.4%)
- 9:                                          (   5,   0.5%)
-10:                                          (   1,   0.1%)
-11:                                          (   1,   0.1%)
+ 1: ████████████████████████████████████████ (1469,  38.4%)
+ 2: ███████████████████████████████████      (1305,  34.1%)
+ 3: ██████████████████████                   ( 816,  21.3%)
+ 4: █████                                    ( 184,   4.8%)
+ 5: █                                        (  41,   1.1%)
+ 6:                                          (  12,   0.3%)
 
 --- NPC Run Length Stats ---
-Mean:   2.16
-Median: 2.00
+Mean:   1.39
+Median: 1.00
 Min:    1
-Max:    9
-IQR:    2.00 (Q1=1.00, Q3=3.00)
+Max:    4
+IQR:    1.00 (Q1=1.00, Q3=2.00)
 
 --- NPC Run Length Histogram ---
- 1: ████████████████████████████████████████ ( 306,  36.6%)
- 2: ████████████████████████████████         ( 252,  30.1%)
- 3: ███████████████████████                  ( 178,  21.3%)
- 4: ███████                                  (  60,   7.2%)
- 5: ███                                      (  29,   3.5%)
- 6:                                          (   6,   0.7%)
- 7:                                          (   3,   0.4%)
- 8:                                          (   2,   0.2%)
- 9:                                          (   1,   0.1%)
+ 1: ████████████████████████████████████████ (2666,  69.7%)
+ 2: █████████████                            ( 877,  22.9%)
+ 3: ███                                      ( 237,   6.2%)
+ 4:                                          (  47,   1.2%)
 
 === Regression Analysis: Run Length vs Win ===
 
 PC Mean Run Length vs PC Win:
-  Correlation (r): +0.2269
-  Linear Model:    P(PC Win) = 0.6764 + +0.0886 * PC_Mean_Run
+  Correlation (r): +0.0000
+  Linear Model:    P(PC Win) = 0.0000 + +0.0000 * PC_Mean_Run
 
 NPC Mean Run Length vs PC Win:
-  Correlation (r): -0.2324
-  Linear Model:    P(PC Win) = 1.1896 + -0.1329 * NPC_Mean_Run
+  Correlation (r): +0.0000
+  Linear Model:    P(PC Win) = 0.0000 + +0.0000 * NPC_Mean_Run
 
 Run Length Difference (PC - NPC) vs PC Win:
-  Correlation (r): +0.3358
-  Linear Model:    P(PC Win) = 0.8607 + +0.1141 * (PC_Run - NPC_Run)
+  Correlation (r): +0.0000
+  Linear Model:    P(PC Win) = 0.0000 + +0.0000 * (PC_Run - NPC_Run)
 
 Interpretation:
-  Strong positive correlation between run length difference and PC victory.
+  Weak/No significant correlation - run length difference does not strongly predict winner.

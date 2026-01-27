@@ -123,8 +123,8 @@
             "npcs": [
                 {
                     "name": "Goblin Test",
-                    "hp": 10,
-                    "dt": 10,
+                    "hp": 40,
+                    "dt": 18,
                     "exp_atk": false,
                     "exp_def": false
                 }
