@@ -23,10 +23,122 @@ def load_scenarios() -> Dict[str, Any]:
         
     return {s['id']: s for s in data['scenarios']}
 
-def print_detailed_stats(name: str, data: List[int]):
+def get_histogram_lines(name: str, data: List[int], max_bar_width: int = 40) -> List[str]:
+    """Generate a text-based histogram as a list of strings."""
+    lines = []
     if not data:
-        print(f"{name}: No data collected.")
-        return
+        return lines
+    
+    from collections import Counter
+    counts = Counter(data)
+    max_val = max(counts.keys())
+    max_count = max(counts.values())
+    
+    lines.append(f"\n--- {name} Run Length Histogram ---")
+    
+    for length in range(1, max_val + 1):
+        count = counts.get(length, 0)
+        bar_length = int((count / max_count) * max_bar_width) if max_count > 0 else 0
+        bar = "█" * bar_length
+        percentage = (count / len(data)) * 100
+        lines.append(f"{length:2d}: {bar:<{max_bar_width}} ({count:4d}, {percentage:5.1f}%)")
+    
+    return lines
+
+def get_regression_lines(battle_data: List[Dict]) -> List[str]:
+    """
+    Perform regression analysis on run length vs win outcome.
+    
+    battle_data: List of dicts with keys: 'winner', 'pc_mean_run', 'npc_mean_run'
+    """
+    lines = []
+    lines.append("\n=== Regression Analysis: Run Length vs Win ===")
+    
+    if len(battle_data) < 10:
+        lines.append("Insufficient data for regression (need at least 10 battles)")
+        return lines
+    
+    # Extract data
+    pc_wins = [1 if b['winner'] == 'pcs' else 0 for b in battle_data]
+    pc_mean_runs = [b['pc_mean_run'] for b in battle_data]
+    npc_mean_runs = [b['npc_mean_run'] for b in battle_data]
+    
+    # Simple correlation calculation (Pearson)
+    def pearson_correlation(x: List[float], y: List[float]) -> float:
+        n = len(x)
+        if n == 0:
+            return 0.0
+        mean_x = sum(x) / n
+        mean_y = sum(y) / n
+        
+        numerator = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y))
+        denom_x = sum((xi - mean_x) ** 2 for xi in x) ** 0.5
+        denom_y = sum((yi - mean_y) ** 2 for yi in y) ** 0.5
+        
+        if denom_x == 0 or denom_y == 0:
+            return 0.0
+        return numerator / (denom_x * denom_y)
+    
+    # Simple linear regression (slope and intercept)
+    def linear_regression(x: List[float], y: List[float]) -> tuple:
+        n = len(x)
+        if n == 0:
+            return 0.0, 0.0
+        mean_x = sum(x) / n
+        mean_y = sum(y) / n
+        
+        numerator = sum((xi - mean_x) * (yi - mean_y) for xi, yi in zip(x, y))
+        denominator = sum((xi - mean_x) ** 2 for xi in x)
+        
+        if denominator == 0:
+            return 0.0, mean_y
+        
+        slope = numerator / denominator
+        intercept = mean_y - slope * mean_x
+        return slope, intercept
+    
+    # Correlation: PC mean run vs PC win
+    corr_pc = pearson_correlation(pc_mean_runs, pc_wins)
+    slope_pc, intercept_pc = linear_regression(pc_mean_runs, pc_wins)
+    
+    # Correlation: NPC mean run vs PC win (should be negative)
+    corr_npc = pearson_correlation(npc_mean_runs, pc_wins)
+    slope_npc, intercept_npc = linear_regression(npc_mean_runs, pc_wins)
+    
+    # Correlation: Run length difference vs PC win
+    run_diff = [p - n for p, n in zip(pc_mean_runs, npc_mean_runs)]
+    corr_diff = pearson_correlation(run_diff, pc_wins)
+    slope_diff, intercept_diff = linear_regression(run_diff, pc_wins)
+    
+    lines.append("\nPC Mean Run Length vs PC Win:")
+    lines.append(f"  Correlation (r): {corr_pc:+.4f}")
+    lines.append(f"  Linear Model:    P(PC Win) = {intercept_pc:.4f} + {slope_pc:+.4f} * PC_Mean_Run")
+    
+    lines.append("\nNPC Mean Run Length vs PC Win:")
+    lines.append(f"  Correlation (r): {corr_npc:+.4f}")
+    lines.append(f"  Linear Model:    P(PC Win) = {intercept_npc:.4f} + {slope_npc:+.4f} * NPC_Mean_Run")
+    
+    lines.append("\nRun Length Difference (PC - NPC) vs PC Win:")
+    lines.append(f"  Correlation (r): {corr_diff:+.4f}")
+    lines.append(f"  Linear Model:    P(PC Win) = {intercept_diff:.4f} + {slope_diff:+.4f} * (PC_Run - NPC_Run)")
+    
+    # Interpretation
+    lines.append("\nInterpretation:")
+    if abs(corr_diff) > 0.3:
+        lines.append(f"  Strong {'positive' if corr_diff > 0 else 'negative'} correlation between run length difference and PC victory.")
+    elif abs(corr_diff) > 0.1:
+        lines.append(f"  Moderate {'positive' if corr_diff > 0 else 'negative'} correlation between run length difference and PC victory.")
+    else:
+        lines.append("  Weak/No significant correlation - run length difference does not strongly predict winner.")
+    
+    return lines
+
+def get_stats_lines(name: str, data: List[int]) -> List[str]:
+    """Generate stats as a list of strings for both printing and file output."""
+    lines = []
+    if not data:
+        lines.append(f"{name}: No data collected.")
+        return lines
         
     _min = min(data)
     _max = max(data)
@@ -47,14 +159,30 @@ def print_detailed_stats(name: str, data: List[int]):
         
     _iqr = q3 - q1
     
-    print(f"\n--- {name} Run Length Stats ---")
-    print(f"Mean:   {_mean:.2f}")
-    print(f"Median: {_median:.2f}")
-    print(f"Min:    {_min}")
-    print(f"Max:    {_max}")
-    print(f"IQR:    {_iqr:.2f} (Q1={q1:.2f}, Q3={q3:.2f})")
+    lines.append(f"\n--- {name} Run Length Stats ---")
+    lines.append(f"Mean:   {_mean:.2f}")
+    lines.append(f"Median: {_median:.2f}")
+    lines.append(f"Min:    {_min}")
+    lines.append(f"Max:    {_max}")
+    lines.append(f"IQR:    {_iqr:.2f} (Q1={q1:.2f}, Q3={q3:.2f})")
+    
+    # Add histogram
+    lines.extend(get_histogram_lines(name, data))
+    
+    return lines
 
-def simulation_loop(scenario_id: str, num_simulations: int):
+def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "default"):
+    """
+    Run battle simulations.
+    
+    Args:
+        scenario_id: ID of the scenario from scenarios.json
+        num_simulations: Number of battles to simulate
+        log_mode: Logging mode - "default", "short", or "verbose"
+            - default: Full first battle details, then just final results
+            - short: Only final results summary
+            - verbose: Full details for every battle
+    """
     scenarios = load_scenarios()
     
     if scenario_id not in scenarios:
@@ -63,9 +191,11 @@ def simulation_loop(scenario_id: str, num_simulations: int):
 
     scenario_config = scenarios[scenario_id]
     print(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
+    print(f"Logging mode: {log_mode}")
     
     total_pcs_runs = []
     total_npcs_runs = []
+    battle_data = []  # Store data for regression: {'winner': str, 'pc_mean_run': float, 'npc_mean_run': float}
     
     pcs_wins = 0
     npcs_wins = 0
@@ -73,31 +203,83 @@ def simulation_loop(scenario_id: str, num_simulations: int):
     # Get root logger to control level globally
     root_logger = logging.getLogger()
     
+    # Remove any existing handlers to start fresh
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
+    # Console handler - always present
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(message)s'))
+    root_logger.addHandler(console_handler)
+    
+    # File handler - writes to simulation_results.txt
+    file_handler = logging.FileHandler("simulation_results.txt", mode='w', encoding='utf-8')
+    file_handler.setFormatter(logging.Formatter('%(message)s'))
+    root_logger.addHandler(file_handler)
+    
+    # Write header to file
+    file_handler.stream.write(f"Scenario: {scenario_config['description']}\n")
+    file_handler.stream.write(f"Simulations: {num_simulations}\n")
+    file_handler.stream.write(f"Log Mode: {log_mode}\n\n")
+    file_handler.stream.flush()
+    
     for i in range(num_simulations):
-        # Set logging level: DEBUG for first run, INFO for subsequent
-        if i == 0:
+        # Set logging level based on mode
+        if log_mode == "verbose":
+            # All battles get full debug
+            root_logger.setLevel(logging.DEBUG)
+        elif log_mode == "default" and i == 0:
+            # Only first battle gets debug
             root_logger.setLevel(logging.DEBUG)
         else:
-            root_logger.setLevel(logging.INFO)
+            # Short mode or default mode after first battle - suppress battle details
+            root_logger.setLevel(logging.WARNING)
             
         pcs_runs, npcs_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config)
         total_pcs_runs.extend(pcs_runs)
         total_npcs_runs.extend(npcs_runs)
+        
+        # Collect detailed stats for regression
+        pc_mean = statistics.mean(pcs_runs) if pcs_runs else 0
+        npc_mean = statistics.mean(npcs_runs) if npcs_runs else 0
+        battle_data.append({
+            'winner': winner,
+            'pc_mean_run': pc_mean,
+            'npc_mean_run': npc_mean
+        })
         
         if winner == "pcs":
             pcs_wins += 1
         else:
             npcs_wins += 1
             
-        # Log result using INFO level so it always shows
-        # Note: Since we switch to INFO level for subsequent runs, strictly INFO logs appeal.
-        # But for the FIRST run (DEBUG level), INFO logs also appear.
-        root_logger.info(f"Battle {i+1}: Winner = {winner.upper()} | Running Score: PCs {pcs_wins} - NPCs {npcs_wins}")
+        # Battle result line
+        battle_result = f"Battle {i+1}: Winner = {winner.upper()} | Running Score: PCs {pcs_wins} - NPCs {npcs_wins}"
+        
+        # Log based on mode (goes to both console and file when level permits)
+        if log_mode == "verbose":
+            root_logger.info(battle_result)
+        elif log_mode == "default" and i == 0:
+            root_logger.info(battle_result)
+        # short mode: don't log individual battles
     
-    print("\n=== Simulation Results ===")
-    print(f"Final Scorecard: PCs {pcs_wins} - NPCs {npcs_wins}")
-    print_detailed_stats("PC", total_pcs_runs)
-    print_detailed_stats("NPC", total_npcs_runs)
+    # Generate results summary - always show
+    root_logger.setLevel(logging.INFO)
+    root_logger.info("\n=== Simulation Results ===")
+    root_logger.info(f"Final Scorecard: PCs {pcs_wins} - NPCs {npcs_wins}")
+    for line in get_stats_lines("PC", total_pcs_runs):
+        root_logger.info(line)
+    for line in get_stats_lines("NPC", total_npcs_runs):
+        root_logger.info(line)
+        
+    # Regression Analysis
+    for line in get_regression_lines(battle_data):
+        root_logger.info(line)
+    
+    # Clean up file handler
+    file_handler.close()
+    root_logger.removeHandler(file_handler)
+    print(f"\nResults written to simulation_results.txt")
 
 def main():
     parser = argparse.ArgumentParser(description="Jenness Battle Simulator")
@@ -105,10 +287,12 @@ def main():
                         help="ID of the scenario to run (from scenarios.json)")
     parser.add_argument("--runs", type=int, default=500, 
                         help="Number of simulations to run")
+    parser.add_argument("--log", type=str, default="default", choices=["default", "short", "verbose"],
+                        help="Logging mode: default (1st battle full, then results), short (results only), verbose (all battles)")
     
     args = parser.parse_args()
     
-    simulation_loop(scenario_id=args.scenario, num_simulations=args.runs)
+    simulation_loop(scenario_id=args.scenario, num_simulations=args.runs, log_mode=args.log)
 
 if __name__ == "__main__":
     main()

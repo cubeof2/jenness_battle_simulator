@@ -1,0 +1,62 @@
+Scenario: The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).
+Simulations: 100
+Log Mode: short
+
+
+=== Simulation Results ===
+Final Scorecard: PCs 90 - NPCs 10
+
+--- PC Run Length Stats ---
+Mean:   2.30
+Median: 2.00
+Min:    1
+Max:    11
+IQR:    2.00 (Q1=1.00, Q3=3.00)
+
+--- PC Run Length Histogram ---
+ 1: ████████████████████████████████████████ ( 401,  43.3%)
+ 2: ██████████████████                       ( 187,  20.2%)
+ 3: █████████████████                        ( 179,  19.3%)
+ 4: ████████                                 (  81,   8.7%)
+ 5: ███                                      (  32,   3.5%)
+ 6: █                                        (  13,   1.4%)
+ 7: ██                                       (  23,   2.5%)
+ 8:                                          (   4,   0.4%)
+ 9:                                          (   5,   0.5%)
+10:                                          (   1,   0.1%)
+11:                                          (   1,   0.1%)
+
+--- NPC Run Length Stats ---
+Mean:   2.16
+Median: 2.00
+Min:    1
+Max:    9
+IQR:    2.00 (Q1=1.00, Q3=3.00)
+
+--- NPC Run Length Histogram ---
+ 1: ████████████████████████████████████████ ( 306,  36.6%)
+ 2: ████████████████████████████████         ( 252,  30.1%)
+ 3: ███████████████████████                  ( 178,  21.3%)
+ 4: ███████                                  (  60,   7.2%)
+ 5: ███                                      (  29,   3.5%)
+ 6:                                          (   6,   0.7%)
+ 7:                                          (   3,   0.4%)
+ 8:                                          (   2,   0.2%)
+ 9:                                          (   1,   0.1%)
+
+=== Regression Analysis: Run Length vs Win ===
+
+PC Mean Run Length vs PC Win:
+  Correlation (r): +0.2269
+  Linear Model:    P(PC Win) = 0.6764 + +0.0886 * PC_Mean_Run
+
+NPC Mean Run Length vs PC Win:
+  Correlation (r): -0.2324
+  Linear Model:    P(PC Win) = 1.1896 + -0.1329 * NPC_Mean_Run
+
+Run Length Difference (PC - NPC) vs PC Win:
+  Correlation (r): +0.3358
+  Linear Model:    P(PC Win) = 0.8607 + +0.1141 * (PC_Run - NPC_Run)
+
+Interpretation:
+  Strong positive correlation between run length difference and PC victory.
