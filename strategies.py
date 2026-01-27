@@ -1,30 +1,29 @@
 import random
-from typing import List, Optional, Protocol, Any
+from typing import List, Any, Optional
 
 # Using Any for combatants to avoid circular imports for now, 
 # or we can use generic T with bound using Protocol if we want to be strict.
 # For simplicity in this script, Any or Object is fine, but we'll try to be clear.
 
-class Combatant(Protocol):
-    name: str
-    dt: int
-    def is_alive(self) -> bool: ...
+# The Combatant Protocol and get_living_members helper are removed as they are not used by the new strategies.
 
-def get_living_members(team: List[Any]) -> List[Any]:
-    return [m for m in team if m.is_alive()]
-
-def lowest_dt_strategy(attacker: Any, enemy_team: List[Any]) -> Optional[Any]:
-    """Target the enemy with the lowest Difficulty Threshold (DT)."""
-    living_enemies = get_living_members(enemy_team)
-    if not living_enemies:
-        return None
-    # Sort by DT, then random index for tie breaking (stable sort)
-    living_enemies.sort(key=lambda x: x.dt)
-    return living_enemies[0]
-
-def random_strategy(attacker: Any, enemy_team: List[Any]) -> Optional[Any]:
-    """Target a random living enemy."""
-    living_enemies = get_living_members(enemy_team)
+def random_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
+    """Randomly selects a target from the living enemies."""
+    living_enemies = [e for e in enemy_team if e.is_alive()]
     if not living_enemies:
         return None
     return random.choice(living_enemies)
+
+def lowest_dt_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
+    """Selects the enemy with the lowest DT."""
+    living_enemies = [e for e in enemy_team if e.is_alive()]
+    if not living_enemies:
+        return None
+    
+    # Check if enemy has DT
+    candidates = [e for e in living_enemies if hasattr(e, 'dt')]
+    if not candidates:
+        # If no candidates have 'dt', fall back to random selection from all living enemies
+        return random.choice(living_enemies)
+        
+    return min(candidates, key=lambda x: x.dt)

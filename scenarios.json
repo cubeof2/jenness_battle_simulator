@@ -3,8 +3,8 @@
         {
             "id": "default_battle",
             "description": "The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).",
-            "starting_momentum": "goodies",
-            "goodies": [
+            "starting_momentum": "pcs",
+            "pcs": [
                 {
                     "name": "PC 1 (Exp Atk/Def)",
                     "hp": 4,
@@ -41,7 +41,7 @@
                     "exp_def": false
                 }
             ],
-            "baddies": [
+            "npcs": [
                 {
                     "name": "Minion 1",
                     "hp": 1,
@@ -110,8 +110,8 @@
         {
             "id": "small_skirmish",
             "description": "A small 1v1 test battle for mechanics validation.",
-            "starting_momentum": "goodies",
-            "goodies": [
+            "starting_momentum": "pcs",
+            "pcs": [
                 {
                     "name": "Hero Test",
                     "hp": 10,
@@ -120,7 +120,7 @@
                     "exp_def": true
                 }
             ],
-            "baddies": [
+            "npcs": [
                 {
                     "name": "Goblin Test",
                     "hp": 10,

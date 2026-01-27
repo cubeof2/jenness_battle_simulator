@@ -1,8 +1,8 @@
 import random
 import logging
 from typing import List, Set, Any, Tuple
-from goodies import Goodies
-from baddies import Baddies
+from pcs import PC
+from npcs import NPC
 from mechanics import Outcome
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def select_actor(team: List[Any], run_actors: Set[Any]) -> Any:
     experts = [c for c in candidates if c.expertise_attack]
     others = [c for c in candidates if not c.expertise_attack]
     
-    # Prefer experts for attacking
+    # Prefer experts for action selection (Attacking)
     if experts:
         return experts[0] # Pick first expert
     if others:
@@ -46,17 +46,17 @@ def select_actor(team: List[Any], run_actors: Set[Any]) -> Any:
 
 def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[int], str]:
     # Initialize Teams from Scenario Config
-    goodies_team = []
-    for g_conf in scenario_config["goodies"]:
-        goodies_team.append(Goodies(
+    pcs_team = []
+    for g_conf in scenario_config["pcs"]:
+        pcs_team.append(PC(
             name=g_conf["name"], 
             expertise_attack=g_conf.get("exp_atk", False), 
             expertise_defense=g_conf.get("exp_def", False)
         ))
         
-    baddies_team = []
-    for b_conf in scenario_config["baddies"]:
-        baddies_team.append(Baddies(
+    npcs_team = []
+    for b_conf in scenario_config["npcs"]:
+        npcs_team.append(NPC(
             name=b_conf["name"], 
             hp=b_conf["hp"], 
             dt=b_conf["dt"], 
@@ -65,15 +65,15 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
         ))
 
     # State
-    current_momentum = scenario_config.get("starting_momentum", "goodies")
+    current_momentum = scenario_config.get("starting_momentum", "pcs")
     run_actors = set() # Track who acted in current run
     run_length = 0
     friction_banes = 0
     friction_active = False # Friction starts AFTER everyone acted once
 
     # Stats Tracking
-    goodies_run_lengths = []
-    baddies_run_lengths = []
+    pcs_run_lengths = []
+    npcs_run_lengths = []
     
     turn_count = 0
     
@@ -81,24 +81,24 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
 
     while True:
         # Check Win
-        if not get_living_members(team=goodies_team):
-            logger.debug("Enemies Win!")
+        if not get_living_members(team=pcs_team):
+            logger.debug("NPCs Win!")
             break
-        if not get_living_members(team=baddies_team):
-            logger.debug("Players Win!")
+        if not get_living_members(team=npcs_team):
+            logger.debug("PCs Win!")
             break
             
         turn_count += 1
         
         # Identify Active Team and Passive Team
-        if current_momentum == "goodies":
-            active_team = goodies_team
-            passive_team = baddies_team
+        if current_momentum == "pcs":
+            active_team = pcs_team
+            passive_team = npcs_team
         else:
-            active_team = baddies_team
-            passive_team = goodies_team
+            active_team = npcs_team
+            passive_team = pcs_team
             
-        # Select Actor
+        # Select Actor and Target
         actor = select_actor(team=active_team, run_actors=run_actors)
         target = select_target(attacker=actor, enemy_team=passive_team)
         
@@ -108,33 +108,62 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
         # Friction Logic
         living_active = get_living_members(team=active_team)
         
-        # Calculate Banes
+        # Calculate Friction Banes for this Turn
         banes = 0
         if friction_active:
             friction_banes += 1
             banes = friction_banes
         
-        # Perform Action (Attack)
-        logger.debug(f"Turn {turn_count}: {actor.name} (Banes: {banes}) attacks {target.name}")
+        logger.debug(f"Turn {turn_count}: {actor.name} (Banes: {banes}) acts against {target.name}")
         
-        # Attack Roll
-        atk_dmg, atk_outcome = actor.make_attack(target=target, banes=banes)
-        
-        attacker_dt = 12
-        if hasattr(actor, 'dt'):
-            attacker_dt = actor.dt
-        
-        def_outcome = target.make_defense(attacker_dt=attacker_dt, banes=0) # Defender has no friction banes
-        
-        # Resolve Damage
-        damage_to_target = atk_dmg
-        if def_outcome == Outcome.CATASTROPHE:
-            logger.debug("Defense Catastrophe! +2 Damage")
-            damage_to_target += 2
+        # --- EXECUTE ACTION ---
+        outcome = Outcome.FAILURE # Default
+        momentum_shift = False # Default
+
+        if isinstance(actor, PC):
+            # PC Attacking NPC
+            damage, outcome = actor.make_attack(target=target, friction_banes=banes)
             
-        if damage_to_target > 0:
-            target.take_damage(amount=damage_to_target)
+            if damage > 0:
+                target.take_damage(amount=damage)
             
+            # PC Success (Keep Momentum) = Clean Success or Triumph
+            if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
+                momentum_shift = False
+                logger.debug("PC Attack Successful! Momentum Retained.")
+            else:
+                momentum_shift = True
+                logger.debug("PC Attack Failed! Momentum Lost.")
+
+        elif isinstance(actor, NPC):
+            # NPC Attacking PC -> PC Defends
+            # Note: banes passed here are friction banes. PC.make_defense will add NPC attack expertise as bane too.
+            outcome = target.make_defense(attacker=actor, friction_banes=banes)
+            
+            # Defense Success (PC Avoids) = Clean Success or Triumph
+            # Defense Failure (PC Hit) = Failure, Setback, Catastrophe
+            
+            damage_to_pc = 0
+            if outcome == Outcome.CATASTROPHE:
+                damage_to_pc = 2
+                logger.debug("PC Defense Catastrophe! Takes 2 Damage.")
+            elif outcome in [Outcome.FAILURE, Outcome.SETBACK]:
+                damage_to_pc = 1
+                logger.debug(f"PC Defense {outcome.value}! Takes 1 Damage.")
+            
+            if damage_to_pc > 0:
+                target.take_damage(amount=damage_to_pc)
+                
+            # If PC Defended Successfully (Clean/Triumph), they STEAL momentum.
+            # If PC Failed (NPC Hit), NPC KEEPS momentum.
+            
+            if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
+                momentum_shift = True
+                logger.debug("PC Defended Successfully! Momentum Stolen.")
+            else:
+                momentum_shift = False
+                logger.debug("PC Defense Failed/Setback. NPC Keeps Momentum.")
+
         # Update Run State (Action successfully taken)
         run_actors.add(actor)
         run_length += 1
@@ -150,44 +179,31 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
              if all_acted:
                  friction_active = True
         
-        # Check Momentum Shift
-        attacker_keeps = atk_outcome in [Outcome.TRIUMPH, Outcome.CLEAN_SUCCESS]
-        defender_steals = def_outcome in [Outcome.TRIUMPH, Outcome.CLEAN_SUCCESS]
-        
-        momentum_shift = False
-        
-        if defender_steals:
-            momentum_shift = True
-            logger.debug("Momentum Stolen by Defender!")
-        elif attacker_keeps:
-            momentum_shift = False
-            logger.debug("Momentum Retained by Attacker!")
-        else:
-            momentum_shift = True
-            logger.debug("Momentum Lost (Failed to Retain)!")
-            
+        # Handle Momentum Shift
         if momentum_shift:
             # Record Run Length
-            if current_momentum == "goodies":
-                goodies_run_lengths.append(run_length)
-                current_momentum = "baddies"
+            if current_momentum == "pcs":
+                pcs_run_lengths.append(run_length)
+                current_momentum = "npcs"
+                logger.debug("Momentum shifts to NPCs.")
             else:
-                baddies_run_lengths.append(run_length)
-                current_momentum = "goodies"
+                npcs_run_lengths.append(run_length)
+                current_momentum = "pcs"
+                logger.debug("Momentum shifts to PCs.")
             
             # Reset Run State
             run_actors = set()
             run_length = 0
             friction_banes = 0
             friction_active = False
-            logger.debug(f"Momentum Shifts to {current_momentum}!")
             
-    # End of Battle - Record last run?
+    # End of Battle - Record last run
     if run_length > 0:
-        if current_momentum == "goodies":
-            goodies_run_lengths.append(run_length)
+        if current_momentum == "pcs":
+            pcs_run_lengths.append(run_length)
         else:
-            baddies_run_lengths.append(run_length)
+            npcs_run_lengths.append(run_length)
             
-    winner = "goodies" if get_living_members(goodies_team) else "baddies"
-    return goodies_run_lengths, baddies_run_lengths, winner
+    winner = "pcs" if get_living_members(pcs_team) else "npcs"
+    return pcs_run_lengths, npcs_run_lengths, winner
+

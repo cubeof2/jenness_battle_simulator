@@ -64,11 +64,11 @@ def simulation_loop(scenario_id: str, num_simulations: int):
     scenario_config = scenarios[scenario_id]
     print(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
     
-    total_goodies_runs = []
-    total_baddies_runs = []
+    total_pcs_runs = []
+    total_npcs_runs = []
     
-    goodies_wins = 0
-    baddies_wins = 0
+    pcs_wins = 0
+    npcs_wins = 0
     
     # Get root logger to control level globally
     root_logger = logging.getLogger()
@@ -80,28 +80,28 @@ def simulation_loop(scenario_id: str, num_simulations: int):
         else:
             root_logger.setLevel(logging.INFO)
             
-        g_runs, b_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config)
-        total_goodies_runs.extend(g_runs)
-        total_baddies_runs.extend(b_runs)
+        pcs_runs, npcs_runs, winner = run_battle(battle_id=i+1, scenario_config=scenario_config)
+        total_pcs_runs.extend(pcs_runs)
+        total_npcs_runs.extend(npcs_runs)
         
-        if winner == "goodies":
-            goodies_wins += 1
+        if winner == "pcs":
+            pcs_wins += 1
         else:
-            baddies_wins += 1
+            npcs_wins += 1
             
         # Log result using INFO level so it always shows
         # Note: Since we switch to INFO level for subsequent runs, strictly INFO logs appeal.
         # But for the FIRST run (DEBUG level), INFO logs also appear.
-        root_logger.info(f"Battle {i+1}: Winner = {winner.title()} | Running Score: Goodies {goodies_wins} - Baddies {baddies_wins}")
+        root_logger.info(f"Battle {i+1}: Winner = {winner.upper()} | Running Score: PCs {pcs_wins} - NPCs {npcs_wins}")
     
     print("\n=== Simulation Results ===")
-    print(f"Final Scorecard: Goodies {goodies_wins} - Baddies {baddies_wins}")
-    print_detailed_stats("Player", total_goodies_runs)
-    print_detailed_stats("Enemy", total_baddies_runs)
+    print(f"Final Scorecard: PCs {pcs_wins} - NPCs {npcs_wins}")
+    print_detailed_stats("PC", total_pcs_runs)
+    print_detailed_stats("NPC", total_npcs_runs)
 
 def main():
     parser = argparse.ArgumentParser(description="Jenness Battle Simulator")
-    parser.add_argument("--scenario", type=str, default="small_skirmish", 
+    parser.add_argument("--scenario", type=str, default="default_battle", 
                         help="ID of the scenario to run (from scenarios.json)")
     parser.add_argument("--runs", type=int, default=500, 
                         help="Number of simulations to run")
