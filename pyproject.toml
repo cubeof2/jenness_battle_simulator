@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "jenness-battle-simulator"
 version = "1.0.0"
 authors = [
-  { name="Jenness", email="your-email@example.com" },
+  { name="cubeof2", email="cubeof2@gmail.com" },
 ]
 description = "A statistical simulation engine for tabletop RPG combat encounters."
 readme = "README.md"
@@ -18,4 +18,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/jenness_battle_simulator"
+"Homepage" = "https://github.com/cubeof2/jenness_battle_simulator"
