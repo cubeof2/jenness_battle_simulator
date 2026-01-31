@@ -1,6 +1,14 @@
 import random
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Protocol, runtime_checkable
+
+@runtime_checkable
+class Combatant(Protocol):
+    """Protocol defining the interface for any entity in combat."""
+    name: str
+    hp: int
+    is_alive: callable
+    take_damage: callable
 
 class Outcome(Enum):
     """Enumeration of possible roll outcomes."""
@@ -46,16 +54,10 @@ def roll_boon(stacks: int = 1) -> int:
     """
     if stacks <= 0:
         return 0
-    elif stacks == 1:
-        return random.randint(1, 4)
-    elif stacks == 2:
-        return random.randint(1, 6)
-    elif stacks == 3:
-        return random.randint(1, 8)
-    elif stacks == 4:
-        return random.randint(1, 10)
-    else:
-        return random.randint(1, 12)
+    
+    from constants import BOON_BANE_DICE
+    sides = BOON_BANE_DICE.get(min(stacks, 5), 12)
+    return random.randint(1, sides)
 
 def roll_bane(stacks: int) -> int:
     """
@@ -76,16 +78,10 @@ def roll_bane(stacks: int) -> int:
     """
     if stacks <= 0:
         return 0
-    elif stacks == 1:
-        return random.randint(1, 4)
-    elif stacks == 2:
-        return random.randint(1, 6)
-    elif stacks == 3:
-        return random.randint(1, 8)
-    elif stacks == 4:
-        return random.randint(1, 10)
-    else:
-        return random.randint(1, 12)
+    
+    from constants import BOON_BANE_DICE
+    sides = BOON_BANE_DICE.get(min(stacks, 5), 12)
+    return random.randint(1, sides)
 
 def calculate_outcome(roll_total: int, dt: int) -> Outcome:
     """

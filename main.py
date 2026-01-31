@@ -1,28 +1,36 @@
 import logging
 import argparse
 import sys
+import json
+from pathlib import Path
+from typing import List, Dict, Any
+
 from battle_engine import run_battle
 from stats import get_stats_lines, get_regression_lines
-from typing import List, Dict, Any
-import statistics
-import json
-import os
+from constants import SCENARIO_FILE, RESULTS_FILE
 
 # Configure Basic Logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger('battle_sim')
 
-SCENARIO_FILE = "scenarios.json"
-
 def load_scenarios() -> Dict[str, Any]:
-    if not os.path.exists(SCENARIO_FILE):
-        print(f"Error: {SCENARIO_FILE} not found.")
+    """Loads and parses the scenario configurations from JSON.
+
+    Returns:
+        A dictionary mapping scenario IDs to their configurations.
+    """
+    path = Path(SCENARIO_FILE)
+    if not path.exists():
+        logger.error(f"Error: {SCENARIO_FILE} not found.")
         return {}
     
-    with open(SCENARIO_FILE, 'r') as f:
-        data = json.load(f)
-        
-    return {s['id']: s for s in data['scenarios']}
+    try:
+        with path.open('r') as f:
+            data = json.load(f)
+        return {s['id']: s for s in data['scenarios']}
+    except (json.JSONDecodeError, KeyError) as e:
+        logger.error(f"Error parsing {SCENARIO_FILE}: {e}")
+        return {}
 
 
 def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "default"):
@@ -44,38 +52,36 @@ def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "def
         return
 
     scenario_config = scenarios[scenario_id]
-    print(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
-    print(f"Logging mode: {log_mode}")
+    logger.info(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
+    logger.info(f"Logging mode: {log_mode}")
     
     total_pcs_runs = []
     total_npcs_runs = []
-    battle_data = []  # Store data for regression: {'winner': str, 'pc_mean_run': float, 'npc_mean_run': float}
+    battle_data = []
     
-    pcs_wins = 0
-    npcs_wins = 0
+    pcs_wins, npcs_wins = 0, 0
     
-    # Get root logger to control level globally
+    # Configure Root Logger and Handlers
     root_logger = logging.getLogger()
-    
-    # Remove any existing handlers to start fresh
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
     
-    # Console handler - always present
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(logging.Formatter('%(message)s'))
     root_logger.addHandler(console_handler)
     
-    # File handler - writes to simulation_results.txt
-    file_handler = logging.FileHandler("simulation_results.txt", mode='w', encoding='utf-8')
-    file_handler.setFormatter(logging.Formatter('%(message)s'))
-    root_logger.addHandler(file_handler)
-    
-    # Write header to file
-    file_handler.stream.write(f"Scenario: {scenario_config['description']}\n")
-    file_handler.stream.write(f"Simulations: {num_simulations}\n")
-    file_handler.stream.write(f"Log Mode: {log_mode}\n\n")
-    file_handler.stream.flush()
+    try:
+        file_handler = logging.FileHandler(RESULTS_FILE, mode='w', encoding='utf-8')
+        file_handler.setFormatter(logging.Formatter('%(message)s'))
+        root_logger.addHandler(file_handler)
+        
+        # Write header to file
+        file_handler.stream.write(f"Scenario: {scenario_config['description']}\n")
+        file_handler.stream.write(f"Simulations: {num_simulations}\n")
+        file_handler.stream.write(f"Log Mode: {log_mode}\n\n")
+    except IOError as e:
+        logger.error(f"Failed to open results file: {e}")
+        return
     
     for i in range(num_simulations):
         # Set logging level based on mode
@@ -94,12 +100,11 @@ def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "def
         total_npcs_runs.extend(npcs_runs)
         
         # Collect detailed stats for regression
-        pc_mean = statistics.mean(pcs_runs) if pcs_runs else 0
-        npc_mean = statistics.mean(npcs_runs) if npcs_runs else 0
+        from statistics import mean
         battle_data.append({
             'winner': winner,
-            'pc_mean_run': pc_mean,
-            'npc_mean_run': npc_mean
+            'pc_mean_run': mean(pcs_runs) if pcs_runs else 0,
+            'npc_mean_run': mean(npcs_runs) if npcs_runs else 0
         })
         
         if winner == "pcs":
@@ -133,7 +138,7 @@ def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "def
     # Clean up file handler
     file_handler.close()
     root_logger.removeHandler(file_handler)
-    print(f"\nResults written to simulation_results.txt")
+    logger.info(f"\nResults written to {RESULTS_FILE}")
 
 def main():
     parser = argparse.ArgumentParser(description="Jenness Battle Simulator")

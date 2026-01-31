@@ -1,13 +1,8 @@
 import random
-from typing import List, Any, Optional
+from typing import List, Optional
+from mechanics import Combatant
 
-# Using Any for combatants to avoid circular imports for now, 
-# or we can use generic T with bound using Protocol if we want to be strict.
-# For simplicity in this script, Any or Object is fine, but we'll try to be clear.
-
-# The Combatant Protocol and get_living_members helper are removed as they are not used by the new strategies.
-
-def random_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
+def random_strategy(actor: Combatant, enemy_team: List[Combatant]) -> Optional[Combatant]:
     """
     Randomly selects a target from the living enemies.
     
@@ -23,7 +18,7 @@ def random_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
         return None
     return random.choice(living_enemies)
 
-def lowest_dt_strategy(actor: Any, enemy_team: List[Any]) -> Optional[Any]:
+def lowest_dt_strategy(actor: Combatant, enemy_team: List[Combatant]) -> Optional[Combatant]:
     """
     Selects the enemy with the lowest Difficulty Threshold (DT).
     

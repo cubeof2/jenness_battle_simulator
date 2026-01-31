@@ -1,9 +1,18 @@
 import statistics
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from collections import Counter
 
 def get_histogram_lines(name: str, data: List[int], max_bar_width: int = 40) -> List[str]:
-    """Generate a text-based histogram as a list of strings."""
+    """Generates a text-based histogram distribution for run lengths.
+
+    Args:
+        name: Label for the data (e.g., 'PC').
+        data: List of run lengths.
+        max_bar_width: Maximum character width for the histogram bars.
+
+    Returns:
+        A list of formatted strings representing the histogram.
+    """
     lines = []
     if not data:
         return lines
@@ -24,10 +33,13 @@ def get_histogram_lines(name: str, data: List[int], max_bar_width: int = 40) -> 
     return lines
 
 def get_regression_lines(battle_data: List[Dict]) -> List[str]:
-    """
-    Perform regression analysis on run length vs win outcome.
-    
-    battle_data: List of dicts with keys: 'winner', 'pc_mean_run', 'npc_mean_run'
+    """Performs regression analysis to determine momentum impact on victory.
+
+    Args:
+        battle_data: List of dictionaries containing battle summary data.
+
+    Returns:
+        A list of formatted strings describing the regression analysis.
     """
     lines = []
     lines.append("\n=== Regression Analysis: Run Length vs Win ===")
@@ -58,7 +70,7 @@ def get_regression_lines(battle_data: List[Dict]) -> List[str]:
         return numerator / (denom_x * denom_y)
     
     # Simple linear regression (slope and intercept)
-    def linear_regression(x: List[float], y: List[float]) -> tuple:
+    def linear_regression(x: List[float], y: List[float]) -> Tuple[float, float]:
         n = len(x)
         if n == 0:
             return 0.0, 0.0
@@ -117,7 +129,15 @@ def get_regression_lines(battle_data: List[Dict]) -> List[str]:
     return lines
 
 def get_stats_lines(name: str, data: List[int]) -> List[str]:
-    """Generate stats as a list of strings for both printing and file output."""
+    """Calculates summary statistics and gathers histogram lines.
+
+    Args:
+        name: Label for the data (e.g., 'PC').
+        data: List of run lengths.
+
+    Returns:
+        A list of formatted strings representing the full stats report for the side.
+    """
     lines = []
     if not data:
         lines.append(f"{name}: No data collected.")

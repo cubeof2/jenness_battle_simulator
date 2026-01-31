@@ -1,33 +1,40 @@
 import logging
 from typing import Any
+from mechanics import Combatant
 from strategies import random_strategy
 
 logger = logging.getLogger(__name__)
 
 class NPC:
-    """
-    Represents a Non-Player Character (Enemy).
+    """Represents a Non-Player Character (Enemy).
     
     Attributes:
-        name (str): The name of the NPC.
-        hp (int): Current Hit Points.
-        max_hp (int): Maximum Hit Points.
-        dt (int): Difficulty Threshold (Defense Class).
-        expertise_attack (bool): If True, imposes a Bane on PC Defense rolls.
-        expertise_defense (bool): If True, imposes a Bane on PC Attack rolls.
-        targeting_strategy (callable): Function to select a target from a list of enemies.
+        name: The display name of the NPC.
+        hp: Current Hit Points.
+        max_hp: Maximum Hit Points.
+        dt: Difficulty Threshold (Defense Class) players must beat.
+        expertise_attack: If True, imposes a Bane on PC Defense rolls.
+        expertise_defense: If True, imposes a Bane on PC Attack rolls.
+        targeting_strategy: Function to select a target from a list of enemies.
     """
-    def __init__(self, name: str, hp: int, dt: int, expertise_attack: bool = False, expertise_defense: bool = False, targeting_strategy=random_strategy):
-        """
-        Initialize an NPC.
+    def __init__(
+        self, 
+        name: str, 
+        hp: int, 
+        dt: int, 
+        expertise_attack: bool = False, 
+        expertise_defense: bool = False, 
+        targeting_strategy: Any = random_strategy
+    ):
+        """Initializes an NPC.
 
         Args:
-            name (str): Name of the NPC.
-            hp (int): Hit points.
-            dt (int): Difficulty Threshold.
-            expertise_attack (bool, optional): Whether the NPC has attack expertise. Defaults to False.
-            expertise_defense (bool, optional): Whether the NPC has defense expertise. Defaults to False.
-            targeting_strategy (callable, optional): Strategy function for targeting. Defaults to random_strategy.
+            name: Name of the NPC.
+            hp: Hit points.
+            dt: Difficulty Threshold.
+            expertise_attack: Whether the NPC has attack expertise.
+            expertise_defense: Whether the NPC has defense expertise.
+            targeting_strategy: Strategy function for targeting.
         """
         self.name = name
         self.hp = hp

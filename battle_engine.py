@@ -1,26 +1,26 @@
 import random
 import logging
-from typing import List, Set, Any, Tuple
+from typing import List, Set, Tuple, Optional
 from pcs import PC
 from npcs import NPC
-from mechanics import Outcome
+from mechanics import Outcome, Combatant
 
 logger = logging.getLogger(__name__)
 
-def get_living_members(team: List[Any]) -> List[Any]:
+def get_living_members(team: List[Combatant]) -> List[Combatant]:
     """Returns a list of members in the team that are currently alive."""
     return [m for m in team if m.is_alive()]
 
-def select_target(attacker: Any, enemy_team: List[Any]) -> Any:
+def select_target(attacker: Combatant, enemy_team: List[Combatant]) -> Optional[Combatant]:
     """
     Selects a target from the enemy team using the attacker's strategy.
     
     Args:
-        attacker (Any): The entity initiating the action.
-        enemy_team (List[Any]): List of potential targets.
+        attacker: The entity initiating the action.
+        enemy_team: List of potential targets.
         
     Returns:
-        Any: The selected target, or None if no valid targets exist.
+        The selected target, or None if no valid targets exist.
     """
     # Use the attacker's strategy if available
     if hasattr(attacker, 'targeting_strategy'):
@@ -32,37 +32,21 @@ def select_target(attacker: Any, enemy_team: List[Any]) -> Any:
         return None
     return random.choice(living_enemies)
 
-def select_actor(team: List[Any], run_actors: Set[Any]) -> Any:
-    """
-    Selects the next character to act from the team.
-    
-    Priority:
-    1. Members who have not yet acted in this run.
-    2. Members with Attack Expertise.
-    3. Any other member.
-    
-    Args:
-        team (List[Any]): The team currently holding momentum.
-        run_actors (Set[Any]): Set of actors who have already acted in the current run.
-        
-    Returns:
-        Any: The selected actor.
-    """
+def select_actor(team: List[Combatant], run_actors: Set[Combatant]) -> Combatant:
+    """Selects the next character to act from the team based on expertise and turn state."""
     living = get_living_members(team=team)
     not_acted = [m for m in living if m not in run_actors]
     
     candidates = not_acted if not_acted else living
     
     # Filter for Attack Experts if possible
-    experts = [c for c in candidates if c.expertise_attack]
-    others = [c for c in candidates if not c.expertise_attack]
+    experts = [c for c in candidates if getattr(c, 'expertise_attack', False)]
+    others = [c for c in candidates if not getattr(c, 'expertise_attack', False)]
     
     # Prefer experts for action selection (Attacking)
     if experts:
-        return experts[0] # Pick first expert
-    if others:
-        return others[0]
-    return candidates[0] # Fallback, shouldn't happen if list not empty
+        return experts[0]
+    return others[0] if others else candidates[0]
 
 def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[int], str]:
     """
@@ -150,67 +134,45 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
         logger.debug(f"Turn {turn_count}: {actor.name} (Friction: {friction_count}) acts against {target.name}")
         
         # --- EXECUTE ACTION ---
-        outcome = Outcome.FAILURE # Default
-        momentum_shift = False # Default
+        momentum_shift = False
 
         if isinstance(actor, PC):
-            # PC Attacking NPC - friction applies as banes (PCs have momentum)
+            from constants import CRITICAL_DAMAGE
+            # PC Attacking NPC - PC has momentum, friction applies as banes
             damage, outcome = actor.make_attack(target=target, friction_banes=friction_count)
             
             if damage > 0:
                 target.take_damage(amount=damage)
             
             # PC Success (Keep Momentum) = Clean Success or Triumph
-            if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
-                momentum_shift = False
-                logger.debug("PC Attack Successful! Momentum Retained.")
-            else:
-                momentum_shift = True
-                logger.debug("PC Attack Failed! Momentum Lost.")
+            momentum_shift = outcome not in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]
+            logger.debug(f"PC Attack {outcome.value}! Momentum {'Lost' if momentum_shift else 'Retained'}.")
 
         elif isinstance(actor, NPC):
             # NPC Attacking PC -> PC Defends
-            # Friction applies as BOONS to PC (NPCs have momentum, friction helps PC defend)
+            # Friction applies as BOONS to PC (NPCs have momentum)
             outcome = target.defend_attack(attacker=actor, friction_boons=friction_count)
-            
-            # Defense Success (PC Avoids) = Clean Success or Triumph
-            # Defense Failure (PC Hit) = Failure, Setback, Catastrophe
             
             damage_to_pc = 0
             if outcome == Outcome.CATASTROPHE:
-                damage_to_pc = 2
-                logger.debug("PC Defense Catastrophe! Takes 2 Damage.")
+                damage_to_pc = CRITICAL_DAMAGE
             elif outcome in [Outcome.FAILURE, Outcome.SETBACK]:
                 damage_to_pc = 1
-                logger.debug(f"PC Defense {outcome.value}! Takes 1 Damage.")
             
             if damage_to_pc > 0:
                 target.take_damage(amount=damage_to_pc)
                 
-            # If PC Defended Successfully (Clean/Triumph), they STEAL momentum.
-            # If PC Failed (NPC Hit), NPC KEEPS momentum.
-            
-            if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
-                momentum_shift = True
-                logger.debug("PC Defended Successfully! Momentum Stolen.")
-            else:
-                momentum_shift = False
-                logger.debug("PC Defense Failed/Setback. NPC Keeps Momentum.")
+            # If PC Defended (Clean/Triumph), they STEAL momentum.
+            momentum_shift = outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]
+            logger.debug(f"PC Defense {outcome.value}! Momentum {'Stolen' if momentum_shift else 'NPC Keeps'}.")
 
-        # Update Run State (Action successfully taken)
+        # Update Run State
         run_actors.add(actor)
         run_length += 1
         
         # Check friction trigger for NEXT turn
-        if not friction_active:
-             # Check if all living members are in run_actors
-             all_acted = True
-             for m in living_active:
-                 if m not in run_actors:
-                     all_acted = False
-                     break
-             if all_acted:
-                 friction_active = True
+        if not friction_active and all(m in run_actors for m in living_active):
+            friction_active = True
         
         # Handle Momentum Shift
         if momentum_shift:

@@ -1,6 +1,6 @@
 # Jenness Battle Simulator
 
-A robust Gatsby-style statistical simulation engine designed to test, balance, and analyze combat encounters for Jenness'tabletop RPG system.
+A robust momentum-based statistical simulation engine designed to test, balance, and analyze combat encounters for Jenness' tabletop RPG system.
 
 ## ⚔️ Purpose
 The Jenness Battle Simulator allows game designers to run thousands of simulated battles in seconds. Its primary goal is to determine the statistical "fairness" and "flow" of combat encounters, helping you identify if a boss is too lethal, if players have enough resources, or if certain mechanics (like expertise or banes) are having the intended impact on gameplay.

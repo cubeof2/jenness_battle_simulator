@@ -1,7 +1,8 @@
-from mechanics import resolve_roll, Outcome
+from typing import Any, Optional, Tuple
 import logging
-from typing import Any, Optional
+from mechanics import resolve_roll, Outcome, Combatant
 from strategies import lowest_dt_strategy
+from constants import DEFAULT_PC_HP, DEFAULT_APTITUDE, CRITICAL_DAMAGE, MIN_DAMAGE
 
 logger = logging.getLogger(__name__)
 
@@ -18,20 +19,25 @@ class PC:
         expertise_defense (bool): If True, grants 2d20kh on Defense rolls.
         targeting_strategy (callable): Function to select a target from a list of enemies.
     """
-    def __init__(self, name: str, expertise_attack: bool = False, expertise_defense: bool = False, targeting_strategy=lowest_dt_strategy):
-        """
-        Initialize a PC.
+    def __init__(
+        self, 
+        name: str, 
+        expertise_attack: bool = False, 
+        expertise_defense: bool = False, 
+        targeting_strategy: Any = lowest_dt_strategy
+    ):
+        """Initializes a PC with health, aptitude, and expertise settings.
 
         Args:
-            name (str): Name of the PC.
-            expertise_attack (bool, optional): Whether the PC has attack expertise. Defaults to False.
-            expertise_defense (bool, optional): Whether the PC has defense expertise. Defaults to False.
-            targeting_strategy (callable, optional): Strategy function for targeting. Defaults to lowest_dt_strategy.
+            name: The display name of the character.
+            expertise_attack: If True, grants advantage on attack rolls.
+            expertise_defense: If True, grants advantage on defense rolls.
+            targeting_strategy: Function used to select targets.
         """
         self.name = name
-        self.hp = 4
-        self.max_hp = 4
-        self.aptitude = 5
+        self.hp = DEFAULT_PC_HP
+        self.max_hp = DEFAULT_PC_HP
+        self.aptitude = DEFAULT_APTITUDE
         self.expertise_attack = expertise_attack
         self.expertise_defense = expertise_defense
         self.targeting_strategy = targeting_strategy
@@ -68,12 +74,9 @@ class PC:
         
         damage = 0
         if outcome == Outcome.TRIUMPH:
-            damage = 2
-        elif outcome == Outcome.CLEAN_SUCCESS:
-             pass 
-             
-        if outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
-             damage = max(1, damage)
+            damage = CRITICAL_DAMAGE
+        elif outcome in [Outcome.CLEAN_SUCCESS, Outcome.TRIUMPH]:
+             damage = max(MIN_DAMAGE, damage)
         
         return damage, outcome
 
