@@ -84,3 +84,17 @@ If you want to customize your runs, use these options in the command window:
 - **Change detail level**: 
   - `python main.py --log short` (Just the final stats)
   - `python main.py --log verbose` (Every single die roll for every battle)
+
+---
+
+## 🧪 Testing & Quality
+To ensure the simulation logic remains accurate, you can run the automated test suite:
+
+1. **Install Test Dependencies**:
+   ```bash
+   pip install pytest
+   ```
+2. **Run Tests**:
+   ```bash
+   python -m pytest
+   ```

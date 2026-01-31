@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 from battle_engine import run_battle
 from stats import get_stats_lines, get_regression_lines
 from constants import SCENARIO_FILE, RESULTS_FILE
+from exceptions import ConfigurationError
 
 # Configure Basic Logging
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -32,6 +33,40 @@ def load_scenarios() -> Dict[str, Any]:
         logger.error(f"Error parsing {SCENARIO_FILE}: {e}")
         return {}
 
+def validate_scenario_config(config: Dict[str, Any]):
+    """Checks if the scenario configuration contains all required data.
+
+    Args:
+        config: The scenario configuration dictionary to validate.
+
+    Raises:
+        ConfigurationError: If required fields are missing or invalid.
+    """
+    required_keys = ['id', 'description', 'pcs', 'npcs', 'starting_momentum']
+    for key in required_keys:
+        if key not in config:
+            raise ConfigurationError(f"Missing required key '{key}' in scenario config.")
+
+    if not config['pcs']:
+        raise ConfigurationError("Scenario must have at least one PC.")
+    if not config['npcs']:
+        raise ConfigurationError("Scenario must have at least one NPC.")
+
+    # Validate PCs
+    for i, pc in enumerate(config['pcs']):
+        if 'name' not in pc:
+            raise ConfigurationError(f"PC at index {i} is missing a name.")
+
+    # Validate NPCs
+    for i, npc in enumerate(config['npcs']):
+        for field in ['name', 'hp', 'dt']:
+            if field not in npc:
+                raise ConfigurationError(f"NPC '{npc.get('name', i)}' is missing field '{field}'.")
+        if npc['hp'] <= 0:
+            raise ConfigurationError(f"NPC '{npc['name']}' must have HP > 0.")
+        if npc['dt'] < 0:
+            raise ConfigurationError(f"NPC '{npc['name']}' must have DT >= 0.")
+
 
 def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "default"):
     """
@@ -52,6 +87,13 @@ def simulation_loop(scenario_id: str, num_simulations: int, log_mode: str = "def
         return
 
     scenario_config = scenarios[scenario_id]
+
+    try:
+        validate_scenario_config(scenario_config)
+    except ConfigurationError as e:
+        logger.error(f"Invalid Scenario Configuration: {e}")
+        return
+
     logger.info(f"Starting {num_simulations} Simulations for scenario: {scenario_config['description']}")
     logger.info(f"Logging mode: {log_mode}")
     

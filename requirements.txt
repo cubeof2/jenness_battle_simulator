@@ -1,2 +1,2 @@
-# Standard Library only
-# No external dependencies required at this time.
+# Test dependencies
+pytest>=7.0.0
