@@ -1,58 +1,107 @@
-Scenario: The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).
-Simulations: 10
-Log Mode: short
+Scenario: OFFSET 7: (Apt 15, DT 22). Testing if high raw numbers change the feel.
+Simulations: 1
+Log Mode: verbose
 
+=== Battle 1 Start ===
+Turn 1: Hero (Friction: 0) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 12 (d20) + 15 (Apt) + 3 (Boon) - 0 (Bane) = 30
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 5
+PC Attack Clean Success! Momentum Retained.
+Turn 2: Hero (Friction: 1) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 19 (d20) + 15 (Apt) + 0 (Boon) - 0 (Bane) = 34
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 4
+PC Attack Clean Success! Momentum Retained.
+Turn 3: Hero (Friction: 2) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 12 (d20) + 15 (Apt) + 0 (Boon) - 4 (Bane) = 23
+  -> vs DT 22: Setback
+PC Attack Setback! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 4: Foe (Friction: 0) acts against Hero
+Hero defends against Foe!
+  -> Defense Roll: 12 (d20) + 15 (Apt) + 3 (Boon, stacks=1) - 0 (Bane) = 30
+  -> vs DT 22: Clean Success
+PC Defense Clean Success! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 5: Hero (Friction: 0) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 3 (d20) + 15 (Apt) + 3 (Boon) - 0 (Bane) = 21
+  -> vs DT 22: Setback
+PC Attack Setback! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 6: Foe (Friction: 0) acts against Hero
+Hero defends against Foe!
+  -> Defense Roll: 12 (d20) + 15 (Apt) + 1 (Boon, stacks=1) - 0 (Bane) = 28
+  -> vs DT 22: Clean Success
+PC Defense Clean Success! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 7: Hero (Friction: 0) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 18 (d20) + 15 (Apt) + 2 (Boon) - 0 (Bane) = 35
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 3
+PC Attack Clean Success! Momentum Retained.
+Turn 8: Hero (Friction: 1) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 19 (d20) + 15 (Apt) + 0 (Boon) - 0 (Bane) = 34
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 2
+PC Attack Clean Success! Momentum Retained.
+Turn 9: Hero (Friction: 2) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 4 (d20) + 15 (Apt) + 0 (Boon) - 2 (Bane) = 17
+  -> vs DT 22: Failure
+PC Attack Failure! Momentum Lost.
+Momentum shifts to NPCs.
+Turn 10: Foe (Friction: 0) acts against Hero
+Hero defends against Foe!
+  -> Defense Roll: 14 (d20) + 15 (Apt) + 3 (Boon, stacks=1) - 0 (Bane) = 32
+  -> vs DT 22: Clean Success
+PC Defense Clean Success! Momentum Stolen.
+Momentum shifts to PCs.
+Turn 11: Hero (Friction: 0) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 16 (d20) + 15 (Apt) + 3 (Boon) - 0 (Bane) = 34
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 1
+PC Attack Clean Success! Momentum Retained.
+Turn 12: Hero (Friction: 1) acts against Foe
+Hero attacks Foe!
+  -> Attack Roll: 15 (d20) + 15 (Apt) + 0 (Boon) - 0 (Bane) = 30
+  -> vs DT 22: Clean Success
+Foe takes 1 damage. HP: 0
+PC Attack Clean Success! Momentum Retained.
+PCs Win!
+Battle 1: Winner = PCS | Running Score: PCs 1 - NPCs 0
 
 === Simulation Results ===
-Final Scorecard: PCs 8 - NPCs 2
+Final Scorecard: PCs 1 - NPCs 0
 
 --- PC Run Length Stats ---
-Mean:   2.40
-Median: 2.00
+Mean:   2.25
+Median: 2.50
 Min:    1
-Max:    9
-IQR:    2.00 (Q1=1.00, Q3=3.00)
+Max:    3
+IQR:    1.75 (Q1=1.25, Q3=3.00)
 
 --- PC Run Length Histogram ---
- 1: ████████████████████████████████████████ (  39,  45.9%)
- 2: ██████████                               (  10,  11.8%)
- 3: ███████████████████                      (  19,  22.4%)
- 4: █████                                    (   5,   5.9%)
- 5: █████████                                (   9,  10.6%)
- 6: █                                        (   1,   1.2%)
- 7:                                          (   0,   0.0%)
- 8: █                                        (   1,   1.2%)
- 9: █                                        (   1,   1.2%)
+ 1: ████████████████████                     (   1,  25.0%)
+ 2: ████████████████████                     (   1,  25.0%)
+ 3: ████████████████████████████████████████ (   2,  50.0%)
 
 --- NPC Run Length Stats ---
-Mean:   2.09
-Median: 2.00
+Mean:   1.00
+Median: 1.00
 Min:    1
-Max:    6
-IQR:    2.00 (Q1=1.00, Q3=3.00)
+Max:    1
+IQR:    0.00 (Q1=1.00, Q3=1.00)
 
 --- NPC Run Length Histogram ---
- 1: █████████████████████████████████        (  25,  32.5%)
- 2: ████████████████████████████████████████ (  30,  39.0%)
- 3: ████████████████████                     (  15,  19.5%)
- 4: ██████                                   (   5,   6.5%)
- 5: █                                        (   1,   1.3%)
- 6: █                                        (   1,   1.3%)
+ 1: ████████████████████████████████████████ (   3, 100.0%)
 
 === Regression Analysis: Run Length vs Win ===
-
-PC Mean Run Length vs PC Win:
-  Correlation (r): +0.5585
-  Linear Model:    P(PC Win) = -0.0951 + +0.3411 * PC_Mean_Run
-
-NPC Mean Run Length vs PC Win:
-  Correlation (r): -0.3487
-  Linear Model:    P(PC Win) = 1.5612 + -0.3776 * NPC_Mean_Run
-
-Run Length Difference (PC - NPC) vs PC Win:
-  Correlation (r): +0.5341
-  Linear Model:    P(PC Win) = 0.6596 + +0.2307 * (PC_Run - NPC_Run)
-
-Interpretation:
-  Healthy: Moderate correlation (0.53). The battle is 'Balanced'.
-  Momentum helps, but character stats and durability still play a significant role.
+Insufficient data for regression (need at least 10 battles)

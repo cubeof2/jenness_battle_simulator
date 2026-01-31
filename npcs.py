@@ -24,7 +24,8 @@ class NPC:
         dt: int, 
         expertise_attack: bool = False, 
         expertise_defense: bool = False, 
-        targeting_strategy: Any = random_strategy
+        targeting_strategy: Any = random_strategy,
+        **kwargs
     ):
         """Initializes an NPC.
 
@@ -40,8 +41,8 @@ class NPC:
         self.hp = hp
         self.max_hp = hp
         self.dt = dt
-        self.expertise_attack = expertise_attack
-        self.expertise_defense = expertise_defense
+        self.expertise_attack = expertise_attack or kwargs.get('exp_atk', False)
+        self.expertise_defense = expertise_defense or kwargs.get('exp_def', False)
         self.targeting_strategy = targeting_strategy
 
     def take_damage(self, amount: int):

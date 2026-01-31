@@ -98,3 +98,28 @@ To ensure the simulation logic remains accurate, you can run the automated test 
    ```bash
    python -m pytest
    ```
+
+## 📊 Benchmarking & Sensitivity
+The project includes a bulk-runner to analyze how robust the momentum system is across many different scenarios.
+
+- **Run All Benchmarks**:
+  ```bash
+  python bulk_run.py
+  ```
+- **View Results**: Detailed markdown reports are generated in the `reports/` directory, showing win rates, momentum correlation (r), and Difficulty-Aptitude offsets.
+
+### 🎯 The Designer's Handbook: Rules of Thumb
+The following table shows the **Offset** (DT - Aptitude) required for a **Balanced (50-60% WR)** encounter:
+
+| Encounter Type | Team Composition | Target Offset (DT - Apt) |
+| :--- | :---: | :---: |
+| **Boss Fight** | 1 NPC vs 5 PCs | **+13 to +14** |
+| **Symmetric** | 5 NPCs vs 5 PCs | **+11 to +12** |
+| **Duel** | 1 NPC vs 1 PC | **+10 to +11** |
+| **Horde** | 10 NPCs vs 1 PC | **+7 to +8** |
+| **Impossible** | 15 NPCs vs 1 PC | **+5 or lower** |
+
+#### 💡 Pro Tips for Designers:
+- **Safety in Numbers**: Fights with more total participants (e.g., 5v5) are **more stable** for players. If you want a predictable tactical experience, add more units to both sides.
+- **The "Lone Hero" Risk**: A 1v1 duel is highly volatile. A single "Catastrophe" can end the fight instantly. In group combat, the momentum system creates a "buffer" that absorbs bad luck.
+- **Scaling Difficulty**: If you want to make an encounter "Hard" (30% WR), simply add **+2** to the target offsets above.

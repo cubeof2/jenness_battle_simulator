@@ -1,132 +1,210 @@
 {
     "scenarios": [
         {
-            "id": "default_battle",
-            "description": "The standard battle with 5 PCs and 9 Enemies (Minions, Elites, Boss).",
+            "id": "offset_7_low",
+            "description": "OFFSET 7: (Apt 5, DT 12). Base baseline.",
             "starting_momentum": "pcs",
             "pcs": [
                 {
-                    "name": "PC 1 (Exp Atk/Def)",
-                    "hp": 4,
-                    "aptitude": 5,
-                    "exp_atk": true,
-                    "exp_def": true
-                },
-                {
-                    "name": "PC 2 (Exp Def)",
-                    "hp": 4,
-                    "aptitude": 5,
-                    "exp_atk": false,
-                    "exp_def": true
-                },
-                {
-                    "name": "PC 3 (Exp Atk)",
-                    "hp": 4,
-                    "aptitude": 5,
-                    "exp_atk": true,
-                    "exp_def": false
-                },
-                {
-                    "name": "PC 4",
-                    "hp": 4,
-                    "aptitude": 5,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "PC 5",
-                    "hp": 4,
-                    "aptitude": 5,
-                    "exp_atk": false,
-                    "exp_def": false
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 5
                 }
             ],
             "npcs": [
                 {
-                    "name": "Minion 1",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Minion 2",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Minion 3",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Minion 4",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Minion 5",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Minion 6",
-                    "hp": 1,
-                    "dt": 12,
-                    "exp_atk": false,
-                    "exp_def": false
-                },
-                {
-                    "name": "Elite 1 (Exp Atk)",
-                    "hp": 2,
-                    "dt": 15,
-                    "exp_atk": true,
-                    "exp_def": false
-                },
-                {
-                    "name": "Elite 2 (Exp Def)",
-                    "hp": 2,
-                    "dt": 15,
-                    "exp_atk": false,
-                    "exp_def": true
-                },
-                {
-                    "name": "Boss",
-                    "hp": 4,
-                    "dt": 18,
-                    "exp_atk": true,
-                    "exp_def": true
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 12
                 }
             ]
         },
         {
-            "id": "small_skirmish",
-            "description": "A small 1v1 test battle for mechanics validation.",
+            "id": "offset_7_high",
+            "description": "OFFSET 7: (Apt 15, DT 22). Testing if high raw numbers change the feel.",
             "starting_momentum": "pcs",
             "pcs": [
                 {
-                    "name": "Hero Test",
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 15
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 22
+                }
+            ]
+        },
+        {
+            "id": "offset_10_low",
+            "description": "OFFSET 10: (Apt 5, DT 15). Balanced/Moderate difficulty.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 5
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 15
+                }
+            ]
+        },
+        {
+            "id": "offset_10_high",
+            "description": "OFFSET 10: (Apt 10, DT 20). Balanced/Moderate at higher target.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 10
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 20
+                }
+            ]
+        },
+        {
+            "id": "offset_13_low",
+            "description": "OFFSET 13: (Apt 5, DT 18). Difficult.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 5
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 18
+                }
+            ]
+        },
+        {
+            "id": "offset_13_high",
+            "description": "OFFSET 13: (Apt 7, DT 20). Difficult at higher target.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Hero",
+                    "hp": 6,
+                    "aptitude": 7
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Foe",
+                    "hp": 6,
+                    "dt": 20
+                }
+            ]
+        },
+        {
+            "id": "stress_horde",
+            "description": "ROBUSTNESS: 1 PC vs 12 Minions. Tests friction impact.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Survivor",
                     "hp": 10,
                     "aptitude": 5,
-                    "exp_atk": true,
                     "exp_def": true
                 }
             ],
             "npcs": [
                 {
-                    "name": "Goblin Test",
-                    "hp": 40,
-                    "dt": 18,
-                    "exp_atk": false,
-                    "exp_def": false
+                    "name": "M1",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M2",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M3",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M4",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M5",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M6",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M7",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M8",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M9",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M10",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M11",
+                    "hp": 1,
+                    "dt": 10
+                },
+                {
+                    "name": "M12",
+                    "hp": 1,
+                    "dt": 10
+                }
+            ]
+        },
+        {
+            "id": "stress_the_wall",
+            "description": "ROBUSTNESS: High Defense Boss. Tests momentum vs high stats.",
+            "starting_momentum": "pcs",
+            "pcs": [
+                {
+                    "name": "Hero",
+                    "hp": 4,
+                    "aptitude": 5
+                }
+            ],
+            "npcs": [
+                {
+                    "name": "Boss",
+                    "hp": 10,
+                    "dt": 20
                 }
             ]
         }

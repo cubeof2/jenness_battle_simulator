@@ -22,24 +22,29 @@ class PC:
     def __init__(
         self, 
         name: str, 
+        hp: Optional[int] = None,
+        aptitude: Optional[int] = None,
         expertise_attack: bool = False, 
         expertise_defense: bool = False, 
-        targeting_strategy: Any = lowest_dt_strategy
+        targeting_strategy: Any = lowest_dt_strategy,
+        **kwargs  # Ignore extra keys from JSON
     ):
         """Initializes a PC with health, aptitude, and expertise settings.
 
         Args:
             name: The display name of the character.
+            hp: Starting and max hit points.
+            aptitude: Base bonus to rolls.
             expertise_attack: If True, grants advantage on attack rolls.
             expertise_defense: If True, grants advantage on defense rolls.
             targeting_strategy: Function used to select targets.
         """
         self.name = name
-        self.hp = DEFAULT_PC_HP
-        self.max_hp = DEFAULT_PC_HP
-        self.aptitude = DEFAULT_APTITUDE
-        self.expertise_attack = expertise_attack
-        self.expertise_defense = expertise_defense
+        self.hp = hp if hp is not None else DEFAULT_PC_HP
+        self.max_hp = self.hp
+        self.aptitude = aptitude if aptitude is not None else DEFAULT_APTITUDE
+        self.expertise_attack = expertise_attack or kwargs.get('exp_atk', False)
+        self.expertise_defense = expertise_defense or kwargs.get('exp_def', False)
         self.targeting_strategy = targeting_strategy
 
     def make_attack(self, target: Any, friction_banes: int) -> tuple[int, Outcome]:

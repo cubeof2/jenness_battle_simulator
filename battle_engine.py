@@ -63,23 +63,8 @@ def run_battle(battle_id: int, scenario_config: dict) -> Tuple[List[int], List[i
             - Winner string ("pcs" or "npcs").
     """
     # Initialize Teams from Scenario Config
-    pcs_team = []
-    for g_conf in scenario_config["pcs"]:
-        pcs_team.append(PC(
-            name=g_conf["name"], 
-            expertise_attack=g_conf.get("exp_atk", False), 
-            expertise_defense=g_conf.get("exp_def", False)
-        ))
-        
-    npcs_team = []
-    for b_conf in scenario_config["npcs"]:
-        npcs_team.append(NPC(
-            name=b_conf["name"], 
-            hp=b_conf["hp"], 
-            dt=b_conf["dt"], 
-            expertise_attack=b_conf.get("exp_atk", False), 
-            expertise_defense=b_conf.get("exp_def", False)
-        ))
+    pcs_team = [PC(**p) for p in scenario_config.get("pcs", [])]
+    npcs_team = [NPC(**n) for n in scenario_config.get("npcs", [])]
 
     # State
     current_momentum = scenario_config.get("starting_momentum", "pcs")
