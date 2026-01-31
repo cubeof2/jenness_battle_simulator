@@ -68,9 +68,11 @@ This measures how many "successes" a side gets in a row.
 The visual bars show the distribution of combat flow. If the histogram is heavily weighted toward "1", the battle is "swingy" and chaotic. If it has many longer runs, the battle is more predictable and one-sided.
 
 ### Regression Analysis
-This is the "balancing" tool. It calculates the correlation between run lengths and winning.
-- **Positive Correlation (+)**: Longer runs strongly lead to winning (as expected).
-- **Interpretation**: If the correlation is weak, it means the battle is decided by luck rather than the specific stats of the characters. If it's too strong, it might mean once a side gets a single hit, the battle is effectively over.
+This is your **Balance Stress-Test**. It measures how much "Momentum Streaks" decide the winner versus the actual stats (HP/Defense) of your characters.
+
+- **High Correlation (>0.6) - "Snowbally"**: One side getting a lucky streak effectively ends the fight. This suggests momentum is too powerful or character HP is too low.
+- **Moderate Correlation (0.3 - 0.6) - "Balanced"**: Momentum helps, but a durable team can survive an enemy's "hot streak" and eventually grind out a win. This is usually the "sweet spot" for tactical play.
+- **Low Correlation (<0.3) - "Grindy/Static"**: Combat flow doesn't matter. The winner is likely decided by who has the biggest raw numbers (like massive HP), and "tactical streaks" aren't impactful.
 
 ---
 

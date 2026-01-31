@@ -102,12 +102,17 @@ def get_regression_lines(battle_data: List[Dict]) -> List[str]:
     
     # Interpretation
     lines.append("\nInterpretation:")
-    if abs(corr_diff) > 0.3:
-        lines.append(f"  Strong {'positive' if corr_diff > 0 else 'negative'} correlation between run length difference and PC victory.")
+    if abs(corr_diff) > 0.6:
+        lines.append(f"  CRITICAL: Strong correlation ({corr_diff:.2f}). The battle is 'Snowbally'.")
+        lines.append("  Victory is likely decided by luck/momentum streaks rather than character durability.")
+    elif abs(corr_diff) > 0.3:
+        lines.append(f"  Healthy: Moderate correlation ({corr_diff:.2f}). The battle is 'Balanced'.")
+        lines.append("  Momentum helps, but character stats and durability still play a significant role.")
     elif abs(corr_diff) > 0.1:
-        lines.append(f"  Moderate {'positive' if corr_diff > 0 else 'negative'} correlation between run length difference and PC victory.")
+        lines.append(f"  Weak Correlation ({corr_diff:.2f}). The battle is 'Grindy'.")
+        lines.append("  Long streaks aren't efficiently ending the fight. Check for high HP vs low damage.")
     else:
-        lines.append("  Weak/No significant correlation - run length difference does not strongly predict winner.")
+        lines.append(f"  No Correlation ({corr_diff:.2f}). Victory appears random or decoupled from momentum.")
     
     return lines
 
